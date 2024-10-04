@@ -5,6 +5,7 @@ import {
   Alert,
   Avatar,
   Box,
+  Badge,
   Button,
   Card,
   Grid,
@@ -22,10 +23,13 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  InputAdornment,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-
+import CommentRoundedIcon from "@mui/icons-material/CommentRounded";
+import ShowChartRoundedIcon from "@mui/icons-material/ShowChartRounded";
 const modules = {
   toolbar: [
     [{ header: "1" }, { header: "2" }, { font: [] }],
@@ -73,55 +77,106 @@ const StyledCardContent = styled(CardContent)({
   flexGrow: 1,
 });
 
-const BlogPost = ({ post, onEdit, onDelete }) => (
-  <StyledCard>
-    <CardMedia
-      component="img"
-      height="200"
-      image="https://images.unsplash.com/photo-1501504905252-473c47e087f8"
-      alt={post.title}
-    />
-    <StyledCardContent>
-      <Typography gutterBottom variant="h5" component="h2">
-        {post.title}
-      </Typography>
-      {!post.author ? (
-        ""
-      ) : (
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Avatar sx={{ width: 24, height: 24, mr: 1 }}>
-            {post.author[0]}
-          </Avatar>
-          <Typography
-            color="textSecondary"
-            sx={{ fontStyle: "italic" }}
-            gutterBottom
-          >
-            By {post.author}
-          </Typography>
-        </Box>
+const BlogPost = ({ post, onEdit, onDelete, onComment, onOpenInsights }) => {
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState("");
+
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      onComment(post.id, newComment);
+      setNewComment("");
+    }
+  };
+
+  return (
+    <StyledCard>
+      <CardMedia
+        component="img"
+        height="200"
+        image="https://images.unsplash.com/photo-1501504905252-473c47e087f8"
+        alt={post.title}
+      />
+      <StyledCardContent>
+        <Typography gutterBottom variant="h5" component="h2">
+          {post.title}
+        </Typography>
+        {!post.author ? (
+          ""
+        ) : (
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Avatar sx={{ width: 24, height: 24, mr: 1 }}>
+              {post.author[0]}
+            </Avatar>
+            <Typography
+              color="textSecondary"
+              sx={{ fontStyle: "italic" }}
+              gutterBottom
+            >
+              By {post.author}
+            </Typography>
+          </Box>
+        )}
+        <Typography variant="body2" color="textSecondary">
+          {post.body.replace(/<\/?[^>]+(>|$)/g, "")}
+        </Typography>
+        <Typography
+          variant="caption"
+          color="textSecondary"
+          sx={{ mt: 1, display: "block" }}
+        >
+          {!post.id ? "" : new Date(post?.id).toLocaleDateString()}
+        </Typography>
+      </StyledCardContent>
+      <CardActions>
+        <IconButton
+          aria-label="comment"
+          onClick={() => setShowComments(!showComments)}
+        >
+          <Badge badgeContent={post.comments.length} color="error">
+            <CommentRoundedIcon />
+          </Badge>
+        </IconButton>
+        <IconButton aria-label="edit" onClick={() => onEdit(post)}>
+          <EditIcon />
+        </IconButton>
+        <IconButton aria-label="delete" onClick={() => onDelete(post.id)}>
+          <DeleteIcon />
+        </IconButton>
+        <IconButton aria-label="charts" onClick={() => onOpenInsights(post)}>
+          <ShowChartRoundedIcon />
+        </IconButton>
+      </CardActions>
+      {showComments && (
+        <CardContent>
+          {post?.comments?.map((comment, index) => (
+            <Typography key={index} variant="body2" gutterBottom>
+              <strong>{post?.author}:</strong> {comment?.text}
+            </Typography>
+          ))}
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Add a comment"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button
+                    onClick={handleAddComment}
+                    disabled={!newComment.trim()}
+                  >
+                    Post
+                  </Button>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </CardContent>
       )}
-      <Typography variant="body2" color="textSecondary">
-        {post.body.replace(/<\/?[^>]+(>|$)/g, "")}
-      </Typography>
-      <Typography
-        variant="caption"
-        color="textSecondary"
-        sx={{ mt: 1, display: "block" }}
-      >
-        {!post.id ? "" : new Date(post?.id).toLocaleDateString()}
-      </Typography>
-    </StyledCardContent>
-    <CardActions>
-      <IconButton aria-label="edit" onClick={() => onEdit(post)}>
-        <EditIcon />
-      </IconButton>
-      <IconButton aria-label="delete" onClick={() => onDelete(post.id)}>
-        <DeleteIcon />
-      </IconButton>
-    </CardActions>
-  </StyledCard>
-);
+    </StyledCard>
+  );
+};
 
 const NoteEditor = () => {
   const [content, setContent] = useState("");
@@ -130,13 +185,12 @@ const NoteEditor = () => {
   const [posts, setPosts] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
-
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
-
+  const navigate = useNavigate();
   useEffect(() => {
     const savedPosts = localStorage.getItem("posts");
     if (savedPosts) {
@@ -162,8 +216,8 @@ const NoteEditor = () => {
         title,
         author,
         body: content,
+        comments: [],
       };
-
       const updatedPosts = [...posts, newPost];
       setPosts(updatedPosts);
       localStorage.setItem("posts", JSON.stringify(updatedPosts));
@@ -179,9 +233,10 @@ const NoteEditor = () => {
       setContent("");
     }
   };
+
   const handleUpdatePost = () => {
     setPosts((prev) =>
-      prev.map((p) => (p.id === editingPost.id ? editingPost : p))
+      prev?.map((p) => (p.id === editingPost.id ? editingPost : p))
     );
     setDialogOpen(false);
     setSnackbar({
@@ -190,15 +245,12 @@ const NoteEditor = () => {
       severity: "success",
     });
   };
-  const handleEdit = (post) => {
-    setTitle(post.title);
-    setAuthor(post.author);
-    setContent(post.body);
-  };
+
   const handlePostEdit = (post) => {
     setEditingPost(post);
     setDialogOpen(true);
   };
+
   const handleDelete = (id) => {
     const updatedPosts = posts.filter((post) => post.id !== id);
     setPosts(updatedPosts);
@@ -210,6 +262,22 @@ const NoteEditor = () => {
     });
   };
 
+  const handleComments = (postId, commentText) => {
+    setPosts((prevPosts) =>
+      prevPosts?.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              comments: [...post.comments, { author, text: commentText }],
+            }
+          : post
+      )
+    );
+    localStorage.setItem("posts", JSON.stringify(posts));
+  };
+  const handleInsights = (post) => {
+    navigate("/insights");
+  };
   return (
     <>
       <Container maxWidth="md">
@@ -253,12 +321,14 @@ const NoteEditor = () => {
           <Grid container spacing={4}>
             {posts &&
               posts?.map((post) => (
-                <Grid item xs={12} sm={6} md={4} key={post._id}>
+                <Grid item xs={12} sm={6} md={4} key={post.id}>
                   <BlogPost
                     key={post.id}
                     post={post}
                     onEdit={handlePostEdit}
                     onDelete={handleDelete}
+                    onComment={handleComments}
+                    onOpenInsights={handleInsights}
                   />
                 </Grid>
               ))}

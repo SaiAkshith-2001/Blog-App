@@ -75,7 +75,12 @@ const BlogRead = () => {
         </Box>
       ) : (
         <Grid item xs={12} sm={6} md={4}>
-          {postDetails &&
+          <Stack>
+            <Typography variant="body2" color="textSecondary">
+              Comment(s) {postDetails.length}
+            </Typography>
+          </Stack>
+          {postDetails.length &&
             postDetails.map((item) => (
               <Stack key={item.id}>
                 <BlogPost>

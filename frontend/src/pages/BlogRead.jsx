@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
+import CommentRoundedIcon from "@mui/icons-material/CommentRounded";
 import { Link } from "react-router-dom";
 const StyledFab = styled(Fab)(({ theme }) => ({
   position: "fixed",
@@ -132,13 +133,13 @@ const BlogRead = () => {
                     </Typography>
                   </StyledCardContent>
                   <CardActions>
-                    <Button
-                      size="small"
+                    <IconButton
+                      aria-label="comments"
                       component={Link}
                       to={`/posts/${item.id}`}
                     >
-                      Read More
-                    </Button>
+                      <CommentRoundedIcon />
+                    </IconButton>
                   </CardActions>
                 </StyledCard>
               </Grid>

@@ -221,6 +221,16 @@ const BlogWrite = () => {
     setPosts((prev) =>
       prev.map((p) => (p.id === editingPost.id ? editingPost : p))
     );
+
+    if (!editingPost.title || !editingPost.body || !editingPost.author) {
+      setSnackbar({
+        open: true,
+        message: "Please fill all fields",
+        severity: "error",
+      });
+      return;
+    }
+
     setDialogOpen(false);
     setSnackbar({
       open: true,
@@ -304,7 +314,6 @@ const BlogWrite = () => {
               variant="contained"
               color="primary"
               onClick={handleCreatePost}
-              // sx={{ mb: 4, textTransform: "none" }}
             >
               Create Post
             </Button>

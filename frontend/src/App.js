@@ -30,6 +30,7 @@ const Register = lazy(() => import("./pages/Register"));
 const NoteEditor = lazy(() => import("./pages/Editor"));
 const BlogRead = lazy(() => import("./pages/BlogRead"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const Insights = lazy(() => import("./pages/Insights"));
 const BlogWrite = lazy(() => import("./pages/BlogWrite"));
 const ThemeToggleButton = lazy(() => import("./component/ToggleButton"));
 const MarkdownEditor = lazy(() => import("./component/MarkdownEditor"));
@@ -268,6 +269,7 @@ function App(props) {
           <Route element={<ProtectedRoute />}>
             <Route path="/write" element={<BlogWrite />} />
             <Route path="/editor" element={<NoteEditor />} />
+            <Route path="/insights" element={<Insights />} />
             <Route path="/posts/:id/" element={<BlogPost />} />
             <Route path="/posts/:id/comments" element={<PostComment />} />
             <Route path="/mdeditor" element={<MarkdownEditor />} />

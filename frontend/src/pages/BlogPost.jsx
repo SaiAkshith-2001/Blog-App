@@ -8,8 +8,6 @@ import {
   CardContent,
   Typography,
   CircularProgress,
-  Button,
-  IconButton,
   CardActions,
   Box,
 } from "@mui/material";
@@ -51,9 +49,6 @@ const BlogPost = () => {
   useEffect(() => {
     getPostDetails();
   }, []);
-  const handleEditPost = () => {
-    console.log("edit post");
-  };
   //   const handleScroll = useCallback(() => {
   //     // console.log(window.innerHeight);
   //     // console.log(document.documentElement.scrollTop);
@@ -97,9 +92,6 @@ const BlogPost = () => {
                 </IconButton> */}
               </CardActions>
             </BlogPostStyled>
-            <Typography variant="body2" color="textSecondary">
-              Comment(s)
-            </Typography>
             <PostComment />
           </Grid>
         </>
