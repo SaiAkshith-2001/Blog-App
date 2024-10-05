@@ -263,17 +263,21 @@ const NoteEditor = () => {
   };
 
   const handleComments = (postId, commentText) => {
-    setPosts((prevPosts) =>
-      prevPosts?.map((post) =>
+    setPosts((prevPosts) => {
+      const updatedComments = prevPosts?.map((post) =>
         post.id === postId
           ? {
               ...post,
-              comments: [...post.comments, { author, text: commentText }],
+              comments: [
+                ...post.comments,
+                { author: post.author, text: commentText },
+              ],
             }
           : post
-      )
-    );
-    localStorage.setItem("posts", JSON.stringify(posts));
+      );
+      localStorage.setItem("posts", JSON.stringify(updatedComments));
+      return updatedComments;
+    });
   };
   const handleInsights = (post) => {
     navigate("/insights");
