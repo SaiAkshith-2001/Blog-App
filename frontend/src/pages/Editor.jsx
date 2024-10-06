@@ -30,8 +30,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CommentRoundedIcon from "@mui/icons-material/CommentRounded";
 import ShowChartRoundedIcon from "@mui/icons-material/ShowChartRounded";
-import { FaHeart, FaEdit, FaTrash, FaShare, FaSearch } from "react-icons/fa";
-
+import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 const modules = {
   toolbar: [
     [{ header: "1" }, { header: "2" }, { font: [] }],
@@ -127,7 +126,7 @@ const BlogPost = ({ post, onEdit, onDelete, onComment, onOpenInsights }) => {
       </StyledCardContent>
       <CardActions>
         <IconButton aria-label="like" onClick={() => setIsLiked(!isLiked)}>
-          <FaHeart color={isLiked ? "red" : "gray"} />
+          <FavoriteRoundedIcon sx={{ color: isLiked ? "red" : "null" }} />
         </IconButton>
         <IconButton
           aria-label="comment"
