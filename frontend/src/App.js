@@ -21,6 +21,7 @@ import {
 import LoadingBar from "react-top-loading-bar";
 import { AuthContext } from "./context/AuthContext";
 import ProtectedRoute from "./component/ProtectedRoute";
+const MarkdownContent = lazy(() => import("./component/MarkdownContent"));
 const PostComment = lazy(() => import("./pages/PostComment"));
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
@@ -33,7 +34,7 @@ const BlogPost = lazy(() => import("./pages/BlogPost"));
 const Insights = lazy(() => import("./pages/Insights"));
 const BlogWrite = lazy(() => import("./pages/BlogWrite"));
 const ThemeToggleButton = lazy(() => import("./component/ToggleButton"));
-const MarkdownEditor = lazy(() => import("./component/MarkdownEditor"));
+
 const MenuIcon = lazy(() => import("@mui/icons-material/Menu"));
 const PersonIcon = lazy(() => import("@mui/icons-material/Person"));
 function App(props) {
@@ -83,6 +84,15 @@ function App(props) {
             to="/editor"
           >
             <ListItemText>Editor</ListItemText>
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton
+            sx={{ textAlign: "center" }}
+            component={Link}
+            to="/md"
+          >
+            <ListItemText>Content</ListItemText>
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
@@ -184,6 +194,14 @@ function App(props) {
               <Button
                 color="inherit"
                 component={Link}
+                to="/md"
+                onClick={() => setProgress(100)}
+              >
+                Content
+              </Button>
+              <Button
+                color="inherit"
+                component={Link}
                 to="/about"
                 onClick={() => setProgress(100)}
               >
@@ -272,7 +290,7 @@ function App(props) {
             <Route path="/insights" element={<Insights />} />
             <Route path="/posts/:id/" element={<BlogPost />} />
             <Route path="/posts/:id/comments" element={<PostComment />} />
-            <Route path="/mdeditor" element={<MarkdownEditor />} />
+            <Route path="/md" element={<MarkdownContent />} />
           </Route>
           {/* handling 404 page not found */}
           <Route path="/*" element={<NotFound />} />
