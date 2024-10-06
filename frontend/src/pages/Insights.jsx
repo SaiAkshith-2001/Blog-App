@@ -44,7 +44,6 @@ const Insights = () => {
       </Box>
     );
   }
-
   const chartOptions = {
     maintainAspectRatio: false,
     responsive: true,
@@ -58,7 +57,6 @@ const Insights = () => {
       },
     },
   };
-
   return (
     <Container>
       <StyledBox sx={{ height: "400px", marginBottom: 4 }}>

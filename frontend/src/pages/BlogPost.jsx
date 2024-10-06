@@ -8,7 +8,6 @@ import {
   CardContent,
   Typography,
   CircularProgress,
-  CardActions,
   Box,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
@@ -28,7 +27,6 @@ const BlogPost = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const getPostDetails = async () => {
-    // Simulating API call to fetch posts
     setIsLoading(true);
     try {
       const response = await fetch(
@@ -86,11 +84,6 @@ const BlogPost = () => {
                   {postDetails.body}
                 </Typography>
               </CardContent>
-              <CardActions>
-                {/* <IconButton aria-label="edit" onClick={handleEditPost}>
-                  <EditIcon /> 
-                </IconButton> */}
-              </CardActions>
             </BlogPostStyled>
             <PostComment />
           </Grid>

@@ -46,8 +46,6 @@ const Login = () => {
         password: values.password,
       });
       login(response.data.accessToken);
-      // console.log(response.data.username);
-      // console.log(response.data.accessToken);
       setSnackbar({
         open: true,
         message: "Login successfully",

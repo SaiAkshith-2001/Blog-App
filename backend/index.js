@@ -7,7 +7,7 @@ const dotenv = require("dotenv");
 
 const app = express();
 dotenv.config();
-app.use(express.json()); //to accept JSON data from frontend
+app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
 

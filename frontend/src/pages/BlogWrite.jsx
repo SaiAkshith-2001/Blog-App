@@ -95,9 +95,6 @@ const BlogWrite = () => {
   const [page, setPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
-  const [title, setNewTitle] = useState("");
-  const [body, setNewBody] = useState("");
-  const [author, setNewAuthor] = useState("");
   const [newPost, setNewPost] = useState({
     title: "",
     author: "",
@@ -110,7 +107,6 @@ const BlogWrite = () => {
   });
 
   const getNews = async () => {
-    // Simulating API call to fetch posts
     setIsLoading(true);
     try {
       const response = await fetch(
@@ -135,29 +131,6 @@ const BlogWrite = () => {
     getNews();
   }, []);
 
-  // const writeNews = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await axios.post(
-  //       "https://jsonplaceholder.typicode.com/posts",
-  //       {
-  //         title,
-  //         author,
-  //         body,
-  //       }
-  //     );
-  //     setIsLoading(false);
-  //     const post = { ...newPost, id: Date.now() };
-  //     setPosts((prev) => [post, ...prev]);
-  //     setNewPost({ title: "", body: "", author: "" });
-  //     setNewTitle("");
-  //     setNewAuthor("");
-  //     setNewBody("");
-  //   } catch (err) {
-  //     setIsLoading(false);
-  //     console.error("Error in fetching data, Please try again later!", err);
-  //   }
-  // };
   const handleCreatePost = () => {
     if (!newPost.title || !newPost.body || !newPost.author) {
       setSnackbar({
@@ -176,31 +149,6 @@ const BlogWrite = () => {
       severity: "success",
     });
   };
-  // const handlePostSave = () => {
-  //   if (!posts.title || !posts.body) {
-  //     setSnackbar({
-  //       open: true,
-  //       message: "Please fill all fields",
-  //       severity: "error",
-  //     });
-  //     return;
-  //   } else if (posts.id) {
-  //     setPosts(posts.map((post) => (post.id === posts.id ? posts : post)));
-  //     setSnackbar({
-  //       open: true,
-  //       message: "Post updated successfully",
-  //       severity: "success",
-  //     });
-  //   } else {
-  //     setPosts([...posts, { id: Date.now().toString() }]);
-  //     setSnackbar({
-  //       open: true,
-  //       message: "Post created successfully",
-  //       severity: "success",
-  //     });
-  //   }
-  //   setDialogOpen(false);
-  // };
 
   const handlePostDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this post?")) {
@@ -230,7 +178,6 @@ const BlogWrite = () => {
       });
       return;
     }
-
     setDialogOpen(false);
     setSnackbar({
       open: true,
@@ -238,42 +185,6 @@ const BlogWrite = () => {
       severity: "success",
     });
   };
-
-  // const handlePostEdit = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await fetch(
-  //       "https://jsonplaceholder.typicode.com/posts",
-  //       {
-  //         method: "PUT",
-  //         headers: {
-  //           "Content-Type": "application /json",
-  //         },
-  //         body: JSON.stringify({
-  //           id,
-  //           title,
-  //           body,
-  //         }),
-  //       }
-  //     );
-  //     const data = await response.json();
-  //     // console.log(data);
-  //     if (!response.ok) {
-  //       throw new Error("please try again!");
-  //     } else {
-  //       setIsLoading(false);
-  //       setCurrentPost({ id: data.id, title: data.title, body: data.body });
-  //       setDialogOpen(true);
-  //     }
-  //   } catch (err) {
-  //     setIsLoading(false);
-  //     console.error("Error in fetching data, Please try again later!", err);
-  //   }
-  // };
-  // useEffect(() => {
-  //   handlePostEdit();
-  // }, []);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewPost((prev) => ({ ...prev, [name]: value }));

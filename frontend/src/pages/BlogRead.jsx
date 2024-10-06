@@ -10,7 +10,6 @@ import {
   Fab,
   CircularProgress,
   CardActions,
-  Button,
   Box,
   IconButton,
   CardMedia,
@@ -46,14 +45,12 @@ const BlogRead = () => {
 
   const getNews = async () => {
     if (!hasMore) return;
-    // Simulating API call to fetch posts
     setIsLoading(true);
     try {
       const response = await fetch(
         `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=10`
       );
       const data = await response.json();
-      //  console.log(data);
       if (!response.ok) {
         throw new Error("please try again!");
       } else {

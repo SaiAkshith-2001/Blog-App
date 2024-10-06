@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css"; // Import Quill styles
+import "react-quill/dist/quill.snow.css";
 import {
   Alert,
   Avatar,
@@ -62,7 +62,6 @@ const formats = [
   "image",
   "video",
 ];
-
 const StyledCard = styled(Card)(() => ({
   height: "100%",
   display: "flex",
@@ -72,22 +71,18 @@ const StyledCard = styled(Card)(() => ({
     transform: "scale(1.03)",
   },
 }));
-
 const StyledCardContent = styled(CardContent)({
   flexGrow: 1,
 });
-
 const BlogPost = ({ post, onEdit, onDelete, onComment, onOpenInsights }) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
-
   const handleAddComment = () => {
     if (newComment.trim()) {
       onComment(post.id, newComment);
       setNewComment("");
     }
   };
-
   return (
     <StyledCard>
       <CardMedia
@@ -383,5 +378,4 @@ const NoteEditor = () => {
     </>
   );
 };
-
 export default NoteEditor;

@@ -3,7 +3,6 @@ import { Container, Box, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-
 const Home = () => {
   const navigate = useNavigate();
   const redirectToRead = () => {
@@ -12,7 +11,6 @@ const Home = () => {
   const redirectToWrite = () => {
     navigate("/write");
   };
-
   return (
     <Container
       sx={{
