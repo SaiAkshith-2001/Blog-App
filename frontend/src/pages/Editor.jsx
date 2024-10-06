@@ -30,6 +30,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CommentRoundedIcon from "@mui/icons-material/CommentRounded";
 import ShowChartRoundedIcon from "@mui/icons-material/ShowChartRounded";
+import { FaHeart, FaEdit, FaTrash, FaShare, FaSearch } from "react-icons/fa";
+
 const modules = {
   toolbar: [
     [{ header: "1" }, { header: "2" }, { font: [] }],
@@ -77,6 +79,7 @@ const StyledCardContent = styled(CardContent)({
 const BlogPost = ({ post, onEdit, onDelete, onComment, onOpenInsights }) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [isLiked, setIsLiked] = useState(false);
   const handleAddComment = () => {
     if (newComment.trim()) {
       onComment(post.id, newComment);
@@ -123,6 +126,9 @@ const BlogPost = ({ post, onEdit, onDelete, onComment, onOpenInsights }) => {
         </Typography>
       </StyledCardContent>
       <CardActions>
+        <IconButton aria-label="like" onClick={() => setIsLiked(!isLiked)}>
+          <FaHeart color={isLiked ? "red" : "gray"} />
+        </IconButton>
         <IconButton
           aria-label="comment"
           onClick={() => setShowComments(!showComments)}
@@ -274,7 +280,7 @@ const NoteEditor = () => {
       return updatedComments;
     });
   };
-  const handleInsights = (post) => {
+  const handleInsights = () => {
     navigate("/insights");
   };
   return (
