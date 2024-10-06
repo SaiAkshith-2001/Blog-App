@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { Box, Button, Grid, Typography, TextField } from "@mui/material";
 const MarkdownEditor = () => {
-  const [markDownContent, setMarkDownContent] = useState("");
+  const [markDownContent, setMarkDownContent] = useState();
 
   useEffect(() => {
     const savedContent = localStorage.getItem("markDownContent");
@@ -16,7 +16,7 @@ const MarkdownEditor = () => {
   };
 
   const handleSave = () => {
-    localStorage.setItem("markdownContent", markDownContent);
+    localStorage.setItem("markDownContent", markDownContent);
     alert("Content saved!");
   };
 

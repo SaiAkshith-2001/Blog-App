@@ -32,7 +32,7 @@ app.post("/api/login", async (req, res) => {
     const user = users.find((u) => u.username === username);
     if (user && (await bcrypt.compare(password, user.password))) {
       const accessToken = jwt.sign({ username: user.username }, "SECRET_KEY", {
-        expiresIn: "2m",
+        expiresIn: "30m",
       });
       res.json({ username: user.username, accessToken });
     } else {
