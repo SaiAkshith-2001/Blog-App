@@ -294,6 +294,7 @@ const NoteEditor = () => {
             onChange={(e) => setTitle(e.target.value)}
             margin="normal"
             required
+            autoFocus
           />
           <TextField
             fullWidth

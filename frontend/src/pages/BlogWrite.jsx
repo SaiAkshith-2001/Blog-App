@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy } from "react";
+import React, { useState, useEffect, lazy, useRef } from "react";
 import {
   Typography,
   Container,
@@ -39,6 +39,25 @@ const StyledCard = styled(Card)(() => ({
 const StyledCardContent = styled(CardContent)({
   flexGrow: 1,
 });
+const DeleteDialog = ({ open, onClose, onConfirm }) => {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  return (
+    <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <DialogTitle>Confirm Delete</DialogTitle>
+      <DialogContent>
+        <Typography>Are you sure you want to delete this post?</Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="primary" variant="contained">
+          Cancel
+        </Button>
+        <Button onClick={onConfirm} color="error" variant="outlined">
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 const BlogPost = ({ post, onEdit, onDelete }) => (
   <StyledCard>
     <CardMedia
@@ -95,6 +114,8 @@ const BlogWrite = () => {
   const [page, setPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
+  const [error, setError] = useState(false);
+  const [helperText, setHelperText] = useState("");
   const [newPost, setNewPost] = useState({
     title: "",
     author: "",
@@ -105,7 +126,7 @@ const BlogWrite = () => {
     message: "",
     severity: "success",
   });
-
+  const inputRef = useRef(null);
   const getNews = async () => {
     setIsLoading(true);
     try {
@@ -133,6 +154,9 @@ const BlogWrite = () => {
 
   const handleCreatePost = () => {
     if (!newPost.title || !newPost.body || !newPost.author) {
+      setError(true);
+      setHelperText("Please fill out this field");
+      inputRef.current.focus();
       setSnackbar({
         open: true,
         message: "Please fill all fields",
@@ -151,14 +175,13 @@ const BlogWrite = () => {
   };
 
   const handlePostDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      setPosts(posts.filter((post) => post.id !== id));
-      setSnackbar({
-        open: true,
-        message: "Post deleted successfully",
-        severity: "success",
-      });
-    }
+    // setDeleteDialogOpen(true);
+    setPosts(posts.filter((post) => post.id !== id));
+    setSnackbar({
+      open: true,
+      message: "Post deleted successfully",
+      severity: "success",
+    });
   };
   const handlePostEdit = (post) => {
     setEditingPost(post);
@@ -200,22 +223,31 @@ const BlogWrite = () => {
         <Paper sx={{ p: 2, mb: 2 }} elevation={3}>
           <TextField
             fullWidth
+            required
+            autoFocus
             label="Title"
             name="title"
             value={newPost.title}
             onChange={handleInputChange}
             margin="normal"
+            error={error}
+            helperText={helperText}
+            inputRef={inputRef}
           />
           <TextField
             fullWidth
+            required
             label="Author"
             name="author"
             value={newPost.author}
             onChange={handleInputChange}
             margin="normal"
+            error={error}
+            helperText={helperText}
           />
           <ReactQuill
             theme="snow"
+            required
             value={newPost.body}
             onChange={handleContentChange}
             placeholder="Write your post content here..."
@@ -253,6 +285,8 @@ const BlogWrite = () => {
         <DialogTitle>Edit Post</DialogTitle>
         <DialogContent>
           <TextField
+            required
+            autoFocus
             fullWidth
             label="Title"
             value={editingPost?.title || ""}
@@ -269,9 +303,11 @@ const BlogWrite = () => {
               setEditingPost((prev) => ({ ...prev, author: e.target.value }))
             }
             margin="normal"
+            required
           />
           <ReactQuill
             theme="snow"
+            required
             value={editingPost?.body || ""}
             onChange={(body) => setEditingPost((prev) => ({ ...prev, body }))}
           />
