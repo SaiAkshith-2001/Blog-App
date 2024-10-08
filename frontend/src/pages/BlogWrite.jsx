@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, useRef } from "react";
+import React, { useState, useEffect, lazy } from "react";
 import {
   Typography,
   Container,
@@ -126,7 +126,6 @@ const BlogWrite = () => {
     message: "",
     severity: "success",
   });
-  const inputRef = useRef(null);
   const getNews = async () => {
     setIsLoading(true);
     try {
@@ -153,10 +152,13 @@ const BlogWrite = () => {
   }, []);
 
   const handleCreatePost = () => {
-    if (!newPost.title || !newPost.body || !newPost.author) {
+    if (
+      newPost.title.trim() === "" ||
+      !newPost.body ||
+      newPost.author.trim() === ""
+    ) {
       setError(true);
-      setHelperText("Please fill out this field");
-      inputRef.current.focus();
+      setHelperText("this is required field");
       setSnackbar({
         open: true,
         message: "Please fill all fields",
@@ -172,6 +174,8 @@ const BlogWrite = () => {
       message: "Post created successfully",
       severity: "success",
     });
+    setError(false);
+    setHelperText("");
   };
 
   const handlePostDelete = (id) => {
@@ -192,8 +196,9 @@ const BlogWrite = () => {
     setPosts((prev) =>
       prev.map((p) => (p.id === editingPost.id ? editingPost : p))
     );
-
-    if (!editingPost.title || !editingPost.body || !editingPost.author) {
+    if (!editingPost?.title || !editingPost?.body || !editingPost?.author) {
+      setError(true);
+      setHelperText("this is required field");
       setSnackbar({
         open: true,
         message: "Please fill all fields",
@@ -207,6 +212,8 @@ const BlogWrite = () => {
       message: "Post updated successfully",
       severity: "success",
     });
+    setError(false);
+    setHelperText("");
   };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -230,9 +237,8 @@ const BlogWrite = () => {
             value={newPost.title}
             onChange={handleInputChange}
             margin="normal"
-            error={error}
-            helperText={helperText}
-            inputRef={inputRef}
+            error={newPost.title.trim() === "" ? error : null}
+            helperText={newPost.title.trim() === "" ? helperText : null}
           />
           <TextField
             fullWidth
@@ -242,8 +248,8 @@ const BlogWrite = () => {
             value={newPost.author}
             onChange={handleInputChange}
             margin="normal"
-            error={error}
-            helperText={helperText}
+            error={newPost.author.trim() === "" ? error : null}
+            helperText={newPost.author.trim() === "" ? helperText : null}
           />
           <ReactQuill
             theme="snow"
@@ -289,21 +295,25 @@ const BlogWrite = () => {
             autoFocus
             fullWidth
             label="Title"
-            value={editingPost?.title || ""}
+            value={editingPost?.title}
             onChange={(e) =>
               setEditingPost((prev) => ({ ...prev, title: e.target.value }))
             }
             margin="normal"
+            error={editingPost?.title === "" ? error : null}
+            helperText={editingPost?.title === "" ? helperText : null}
           />
           <TextField
             fullWidth
             label="Author"
-            value={editingPost?.author || ""}
+            value={editingPost?.author}
             onChange={(e) =>
               setEditingPost((prev) => ({ ...prev, author: e.target.value }))
             }
             margin="normal"
             required
+            error={editingPost?.author === "" ? error : null}
+            helperText={editingPost?.author === "" ? helperText : null}
           />
           <ReactQuill
             theme="snow"

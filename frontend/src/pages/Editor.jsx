@@ -77,7 +77,6 @@ const StyledCardContent = styled(CardContent)({
 });
 const BlogPost = ({ post, onEdit, onDelete, onComment, onOpenInsights }) => {
   const [showComments, setShowComments] = useState(false);
-
   const [newComment, setNewComment] = useState("");
   const [isLiked, setIsLiked] = useState(false);
   const handleAddComment = () => {
@@ -183,7 +182,6 @@ const NoteEditor = () => {
   const [error, setError] = useState(false);
   const [helperText, setHelperText] = useState("");
   const [content, setContent] = useState("");
-  const inputRef = useRef(null);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [posts, setPosts] = useState([]);
@@ -207,10 +205,9 @@ const NoteEditor = () => {
   };
 
   const handleSave = () => {
-    if (!title || !content || !author) {
+    if (title.trim() === "" || !content || author.trim() === "") {
       setError(true);
-      setHelperText("Please fill out this field");
-      inputRef.current.focus();
+      setHelperText("this is required field");
       setSnackbar({
         open: true,
         message: "Please fill all fields",
@@ -237,13 +234,21 @@ const NoteEditor = () => {
       setAuthor("");
       setContent("");
     }
+    setError(false);
+    setHelperText("");
   };
 
   const handleUpdatePost = () => {
     setPosts((prev) =>
       prev?.map((p) => (p.id === editingPost.id ? editingPost : p))
     );
-    if (!editingPost.title || !editingPost.content || !editingPost.author) {
+    if (
+      editingPost?.title.trim() === "" ||
+      editingPost.content === "" ||
+      editingPost.author.trim() === ""
+    ) {
+      setError(true);
+      setHelperText("this is required field");
       setSnackbar({
         open: true,
         message: "Please fill all fields",
@@ -257,6 +262,8 @@ const NoteEditor = () => {
       message: "Post updated successfully",
       severity: "success",
     });
+    setError(false);
+    setHelperText("");
   };
 
   const handlePostEdit = (post) => {
@@ -308,9 +315,8 @@ const NoteEditor = () => {
             margin="normal"
             required
             autoFocus
-            error={error}
-            helperText={helperText}
-            inputRef={inputRef}
+            error={title.trim() === "" ? error : null}
+            helperText={title.trim() === "" ? helperText : null}
           />
           <TextField
             fullWidth
@@ -320,8 +326,8 @@ const NoteEditor = () => {
             onChange={(e) => setAuthor(e.target.value)}
             margin="normal"
             required
-            error={error}
-            helperText={helperText}
+            error={author.trim() === "" ? error : null}
+            helperText={author.trim() === "" ? helperText : null}
           />
           <ReactQuill
             value={content}
@@ -369,6 +375,8 @@ const NoteEditor = () => {
               setEditingPost((prev) => ({ ...prev, title: e.target.value }))
             }
             margin="normal"
+            error={editingPost?.title.trim() === "" ? error : null}
+            helperText={editingPost?.title.trim() === "" ? helperText : null}
           />
           <TextField
             fullWidth
@@ -378,6 +386,8 @@ const NoteEditor = () => {
               setEditingPost((prev) => ({ ...prev, author: e.target.value }))
             }
             margin="normal"
+            error={editingPost?.author.trim() === "" ? error : null}
+            helperText={editingPost?.author.trim() === "" ? helperText : null}
           />
           <ReactQuill
             theme="snow"
