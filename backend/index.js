@@ -35,6 +35,8 @@ app.post("/api/login", async (req, res) => {
         expiresIn: "30m",
       });
       res.json({ username: user.username, accessToken });
+    } else if (!user) {
+      res.status(404).json({ message: "User does not exists" });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
     }

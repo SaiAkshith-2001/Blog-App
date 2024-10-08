@@ -15,17 +15,26 @@ import {
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+
 const loginValidationSchema = Yup.object().shape({
   username: Yup.string()
-    .min(6, "Username should be of minimum 6 characters length")
-    .required("Username is required"),
+    .required("Username is required")
+    .min(6, "Username should be of minimum 6 characters length"),
   password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
+    .required("Password is required")
+    .min(8, "Password must be at least 8 characters"),
 });
 
 const Login = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(loginValidationSchema),
+  });
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -39,35 +48,47 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = async (values, { setSubmitting }) => {
+  const onSubmit = async (data) => {
     try {
       const response = await axios.post("http://localhost:5000/api/login", {
-        username: values.username,
-        password: values.password,
+        username: data.username,
+        password: data.password,
       });
       login(response.data.accessToken);
-      setSnackbar({
-        open: true,
-        message: "Login successfully",
-        severity: "success",
-      });
+      if (response.data && response.status === 200) {
+        setSnackbar({
+          open: true,
+          message: "Login successfully",
+          severity: "success",
+        });
+      }
       navigate("/write");
     } catch (error) {
       console.error("Login failed", error);
-      setSnackbar({
-        open: true,
-        message: "Login failed, Please verify your credentials!",
-        severity: "error",
-      });
-    } finally {
-      setSubmitting(false);
+      if (error.response && error.response.status === 401) {
+        setSnackbar({
+          open: true,
+          message: "Invalid password, Please verify!",
+          severity: "error",
+        });
+      } else if (error.response && error.response.status === 404) {
+        setSnackbar({
+          open: true,
+          message: "User does not exists!",
+          severity: "error",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: "Something went wrong Please try again later!",
+          severity: "error",
+        });
+      }
     }
   };
-
   const redirectToRegister = () => {
     navigate("/register");
   };
-
   return (
     <Container component="main" maxWidth="xs">
       <Box
@@ -81,77 +102,64 @@ const Login = () => {
         <Typography variant="h4" component="h1">
           Login
         </Typography>
-        <Formik
-          initialValues={{ username: "", password: "" }}
-          validationSchema={loginValidationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ isSubmitting }) => (
-            <Form>
-              <Field
-                as={TextField}
-                label="Username"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                name="username"
-                autoFocus
-                helperText={<ErrorMessage name="username" />}
-              />
-              <Field
-                as={TextField}
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                name="password"
-                helperText={<ErrorMessage name="password" />}
-                InputProps={{
-                  endAdornment: (
-                    <IconButton onClick={handleShowPassword}>
-                      {showPassword ? (
-                        <VisibilityOffIcon />
-                      ) : (
-                        <VisibilityIcon />
-                      )}
-                    </IconButton>
-                  ),
-                }}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                sx={{ textTransform: "none", my: "2rem" }}
-                disabled={isSubmitting}
-              >
-                Login
-              </Button>
-              <Button
-                variant="outlined"
-                color="primary"
-                fullWidth
-                sx={{ textTransform: "none" }}
-                onClick={redirectToRegister}
-              >
-                Create an account/Sign up
-              </Button>
-              <Snackbar
-                open={snackbar.open}
-                autoHideDuration={3000}
-                onClose={() =>
-                  setSnackbar((prev) => ({ ...prev, open: false }))
-                }
-              >
-                <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
-                  {snackbar.message}
-                </Alert>
-              </Snackbar>
-            </Form>
-          )}
-        </Formik>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <TextField
+            label="Username"
+            name="username"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            {...register("username")}
+            error={Boolean(errors.username)}
+            helperText={errors.username?.message}
+          />
+          <TextField
+            label="Password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            {...register("password")}
+            error={Boolean(errors.password)}
+            helperText={errors.password?.message}
+            InputProps={{
+              endAdornment: (
+                <IconButton onClick={handleShowPassword}>
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              ),
+            }}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ textTransform: "none", my: "2rem" }}
+            disabled={isSubmitting}
+          >
+            Login
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            fullWidth
+            sx={{ textTransform: "none" }}
+            onClick={redirectToRegister}
+          >
+            Create an account/Sign up
+          </Button>
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={3000}
+            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          >
+            <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
+        </form>
       </Box>
     </Container>
   );

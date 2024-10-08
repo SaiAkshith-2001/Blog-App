@@ -156,7 +156,7 @@ const BlogWrite = () => {
     if (!newPost.title || !newPost.body || !newPost.author) {
       setError(true);
       setHelperText("Please fill out this field");
-      inputRef.current.focus();
+      // inputRef.current.focus();
       setSnackbar({
         open: true,
         message: "Please fill all fields",
