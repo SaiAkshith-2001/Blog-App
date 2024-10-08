@@ -34,11 +34,11 @@ const MarkdownEditor = () => {
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <TextField
-            label="Markdown Input"
+            label="Enter your markdown content here..."
             value={markDownContent}
             onChange={handleChange}
             multiline
-            rows={10}
+            rows={16}
             variant="outlined"
             fullWidth
           />
@@ -53,7 +53,7 @@ const MarkdownEditor = () => {
               border: "1px solid #ddd",
               padding: 2,
               borderRadius: 1,
-              minHeight: "200px",
+              minHeight: "400px",
             }}
           >
             <ReactMarkdown>{markDownContent}</ReactMarkdown>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import {
@@ -77,6 +77,7 @@ const StyledCardContent = styled(CardContent)({
 });
 const BlogPost = ({ post, onEdit, onDelete, onComment, onOpenInsights }) => {
   const [showComments, setShowComments] = useState(false);
+
   const [newComment, setNewComment] = useState("");
   const [isLiked, setIsLiked] = useState(false);
   const handleAddComment = () => {
@@ -179,7 +180,10 @@ const BlogPost = ({ post, onEdit, onDelete, onComment, onOpenInsights }) => {
 };
 
 const NoteEditor = () => {
+  const [error, setError] = useState(false);
+  const [helperText, setHelperText] = useState("");
   const [content, setContent] = useState("");
+  const inputRef = useRef(null);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [posts, setPosts] = useState([]);
@@ -203,7 +207,10 @@ const NoteEditor = () => {
   };
 
   const handleSave = () => {
-    if (!title || !content) {
+    if (!title || !content || !author) {
+      setError(true);
+      setHelperText("Please fill out this field");
+      inputRef.current.focus();
       setSnackbar({
         open: true,
         message: "Please fill all fields",
@@ -221,13 +228,11 @@ const NoteEditor = () => {
       const updatedPosts = [...posts, newPost];
       setPosts(updatedPosts);
       localStorage.setItem("posts", JSON.stringify(updatedPosts));
-
       setSnackbar({
         open: true,
         message: "Post created successfully",
         severity: "success",
       });
-
       setTitle("");
       setAuthor("");
       setContent("");
@@ -238,6 +243,14 @@ const NoteEditor = () => {
     setPosts((prev) =>
       prev?.map((p) => (p.id === editingPost.id ? editingPost : p))
     );
+    if (!editingPost.title || !editingPost.content || !editingPost.author) {
+      setSnackbar({
+        open: true,
+        message: "Please fill all fields",
+        severity: "error",
+      });
+      return;
+    }
     setDialogOpen(false);
     setSnackbar({
       open: true,
@@ -295,6 +308,9 @@ const NoteEditor = () => {
             margin="normal"
             required
             autoFocus
+            error={error}
+            helperText={helperText}
+            inputRef={inputRef}
           />
           <TextField
             fullWidth
@@ -304,6 +320,8 @@ const NoteEditor = () => {
             onChange={(e) => setAuthor(e.target.value)}
             margin="normal"
             required
+            error={error}
+            helperText={helperText}
           />
           <ReactQuill
             value={content}
