@@ -112,6 +112,7 @@ const Login = () => {
             {...register("username")}
             error={Boolean(errors.username)}
             helperText={errors.username?.message}
+            autoFocus
           />
           <TextField
             label="Password"

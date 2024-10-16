@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import {
@@ -13,6 +13,7 @@ import {
   CardContent,
   CardMedia,
   Container,
+  Fab,
   IconButton,
   Paper,
   Snackbar,
@@ -25,12 +26,13 @@ import {
   DialogActions,
   InputAdornment,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CommentRoundedIcon from "@mui/icons-material/CommentRounded";
 import ShowChartRoundedIcon from "@mui/icons-material/ShowChartRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 const modules = {
   toolbar: [
     [{ header: "1" }, { header: "2" }, { font: [] }],
@@ -63,6 +65,11 @@ const formats = [
   "image",
   "video",
 ];
+const StyledFab = styled(Fab)(({ theme }) => ({
+  position: "fixed",
+  bottom: theme.spacing(2),
+  right: theme.spacing(2),
+}));
 const StyledCard = styled(Card)(() => ({
   height: "100%",
   display: "flex",
@@ -303,7 +310,7 @@ const NoteEditor = () => {
     navigate("/insights");
   };
   return (
-    <>
+    <Container>
       <Container maxWidth="md">
         <Paper elevation={3} sx={{ padding: 2, marginTop: "8rem" }}>
           <TextField
@@ -409,7 +416,12 @@ const NoteEditor = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </>
+      <StyledFab color="primary" aria-label="add">
+        <IconButton color="inherit" component={Link} to="/askai">
+          <AutoAwesomeRoundedIcon />
+        </IconButton>
+      </StyledFab>
+    </Container>
   );
 };
 export default NoteEditor;

@@ -34,6 +34,7 @@ const MarkdownEditor = () => {
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <TextField
+            autoFocus
             label="Enter your markdown content here..."
             value={markDownContent}
             onChange={handleChange}

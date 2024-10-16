@@ -21,6 +21,7 @@ import {
 import LoadingBar from "react-top-loading-bar";
 import { AuthContext } from "./context/AuthContext";
 import ProtectedRoute from "./component/ProtectedRoute";
+import AskAI from "./pages/AskAI";
 const MarkdownContent = lazy(() => import("./component/MarkdownContent"));
 const PostComment = lazy(() => import("./pages/PostComment"));
 const Home = lazy(() => import("./pages/Home"));
@@ -291,6 +292,7 @@ function App(props) {
             <Route path="/posts/:id/" element={<BlogPost />} />
             <Route path="/posts/:id/comments" element={<PostComment />} />
             <Route path="/md" element={<MarkdownContent />} />
+            <Route path="/askai" element={<AskAI />} />
           </Route>
           {/* handling 404 page not found */}
           <Route path="/*" element={<NotFound />} />

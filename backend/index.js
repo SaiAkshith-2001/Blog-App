@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const { Configuration, OpenAIApi } = require("openai");
 
 const app = express();
 dotenv.config();
@@ -11,7 +12,13 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
 
-const PORT = process.env.PORT || 5000;
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const openai = new OpenAIApi(configuration);
+
+const PORT = process.env.PORT;
 
 const users = [];
 
@@ -66,5 +73,18 @@ app.get("/api/write", verify, (req, res) => {
 app.get("/api/editor", verify, (req, res) => {
   res.json({ message: "Authenticated!, " + req.user.username });
 });
-
+app.post("/api/askai", async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    const response = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt,
+      maxTokens: 150,
+      // temperature: 0,
+    });
+    res.json({ message: response.data.choices[0].text });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 app.listen(PORT, () => console.log(`listening on ${PORT}`));

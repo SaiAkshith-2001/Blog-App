@@ -39,25 +39,24 @@ const StyledCard = styled(Card)(() => ({
 const StyledCardContent = styled(CardContent)({
   flexGrow: 1,
 });
-const DeleteDialog = ({ open, onClose, onConfirm }) => {
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  return (
-    <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-      <DialogTitle>Confirm Delete</DialogTitle>
-      <DialogContent>
-        <Typography>Are you sure you want to delete this post?</Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="primary" variant="contained">
-          Cancel
-        </Button>
-        <Button onClick={onConfirm} color="error" variant="outlined">
-          Delete
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
+// const DeleteDialog = ({ open, onClose, onConfirm }) => {
+//   return (
+//     <Dialog open={} onClose={}>
+//       <DialogTitle>Confirm Delete</DialogTitle>
+//       <DialogContent>
+//         <Typography>Are you sure you want to delete this post?</Typography>
+//       </DialogContent>
+//       <DialogActions>
+//         <Button onClick={onClose} color="primary" variant="contained">
+//           Cancel
+//         </Button>
+//         <Button onClick={onConfirm} color="error" variant="outlined">
+//           Delete
+//         </Button>
+//       </DialogActions>
+//     </Dialog>
+//   );
+// };
 const BlogPost = ({ post, onEdit, onDelete }) => (
   <StyledCard>
     <CardMedia
@@ -109,6 +108,7 @@ const BlogPost = ({ post, onEdit, onDelete }) => (
 );
 
 const BlogWrite = () => {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -179,13 +179,13 @@ const BlogWrite = () => {
   };
 
   const handlePostDelete = (id) => {
-    // setDeleteDialogOpen(true);
     setPosts(posts.filter((post) => post.id !== id));
     setSnackbar({
       open: true,
       message: "Post deleted successfully",
       severity: "success",
     });
+    setDeleteDialogOpen(false);
   };
   const handlePostEdit = (post) => {
     setEditingPost(post);
@@ -280,13 +280,34 @@ const BlogWrite = () => {
                   <BlogPost
                     post={post}
                     onEdit={handlePostEdit}
-                    onDelete={handlePostDelete}
+                    onDelete={() => setDeleteDialogOpen(true)}
                   />
                 </Grid>
               ))}
           </Grid>
         )}
       </Container>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this post?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            color="primary"
+            variant="contained"
+          >
+            Cancel
+          </Button>
+          <Button onClick={handlePostDelete} color="error" variant="outlined">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit Post</DialogTitle>
         <DialogContent>
