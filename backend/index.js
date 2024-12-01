@@ -1,11 +1,11 @@
-const express = require("express");
-const jwt = require("jsonwebtoken");
-const bodyParser = require("body-parser");
-const bcrypt = require("bcryptjs");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const { Configuration, OpenAIApi } = require("openai");
-
+import express from "express";
+import jwt from "jsonwebtoken";
+import bodyParser from "body-parser";
+import bcrypt from "bcryptjs";
+import cors from "cors";
+import dotenv from "dotenv";
+import { Configuration, OpenAIApi } from "openai";
+import { connectionDB } from "./src/db/index.js";
 const app = express();
 dotenv.config();
 app.use(express.json());
@@ -18,7 +18,7 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8000;
 
 const users = [];
 
@@ -64,7 +64,7 @@ const verify = async (req, res, next) => {
       next();
     });
   } else {
-    res.status(401).json({ message: "not authenicated!" });
+    res.status(401).json({ message: "not authenticated!" });
   }
 };
 app.get("/api/write", verify, (req, res) => {
@@ -87,4 +87,8 @@ app.post("/api/askai", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+connectionDB()
+  .then()
+  .catch((error) => console);
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
