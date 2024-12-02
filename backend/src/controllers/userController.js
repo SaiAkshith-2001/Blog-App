@@ -1,6 +1,5 @@
-// import User from '../models/User.js';
-
-// // Get All Users
+import { User } from "../models/user.Schema.js";
+//  Get All Users
 // export const getAllUsers = async (req, res) => {
 //   try {
 //     const users = await User.find();
@@ -16,7 +15,6 @@
 //     });
 //   }
 // };
-
 // // Get User by ID
 // export const getUserById = async (req, res) => {
 //   try {
@@ -38,23 +36,21 @@
 //     });
 //   }
 // };
-
-// // Create User
-// export const createUser = async (req, res) => {
-//   try {
-//     const newUser = await User.create(req.body);
-//     res.status(201).json({
-//       status: 'success',
-//       data: { user: newUser }
-//     });
-//   } catch (error) {
-//     res.status(400).json({
-//       status: 'error',
-//       message: error.message
-//     });
-//   }
-// };
-
+// Create User
+export const createUser = async (req, res) => {
+  try {
+    const newUser = await User.create(req.body);
+    res.status(201).json({
+      status: "success",
+      data: { user: newUser },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
 // // Update User
 // export const updateUser = async (req, res) => {
 //   try {
@@ -82,7 +78,6 @@
 //     });
 //   }
 // };
-
 // // Delete User
 // export const deleteUser = async (req, res) => {
 //   try {
@@ -94,7 +89,6 @@
 //         message: 'User not found'
 //       });
 //     }
-
 //     res.status(204).json({
 //       status: 'success',
 //       data: null
