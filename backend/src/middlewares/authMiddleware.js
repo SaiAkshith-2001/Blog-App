@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/user.Schema.js";
+import { User } from "../models/user.Schema.js";
 
 export const authMiddleware = async (req, res, next) => {
   verifyToken: async (req, res, next) => {
@@ -26,7 +26,6 @@ export const authMiddleware = async (req, res, next) => {
       }
       // Attach user to request object
       req.user = user;
-      //req.token = token;
       next();
     } catch (error) {
       if (error.name === "JsonWebTokenError") {

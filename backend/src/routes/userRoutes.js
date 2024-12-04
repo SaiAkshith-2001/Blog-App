@@ -6,18 +6,20 @@ import express from "express";
 // //   updateUser,
 // //   deleteUser,
 // } from "../controllers/userController.js";
-// // import { authMiddleware } from "../middleware/authMiddleware.js";
+// import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { createUser } from "../controllers/userController.js";
+import { login } from "../controllers/authController.js";
 const router = express.Router();
 
-// // GET all users
+// // GET all userss
 // router.get("/", authMiddleware, getAllUsers);
 
 // // GET user by ID
-router.get("/:id", authMiddleware, getUserById);
+// router.get("/:id", authMiddleware, getUserById);
 
 // // CREATE new user
-router.post("/api/register", createUser);
+router.post("/register", createUser);
+router.post("/login", login);
 
 // // UPDATE user
 // router.put("/:id", authMiddleware, updateUser);

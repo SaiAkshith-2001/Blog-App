@@ -2,9 +2,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-// import { Configuration, OpenAIApi } from "openai";
-import { connectionDB } from "./src/db/index.js";
+import { connectionDB } from "./src/config/db.js";
 import userRoutes from "./src/routes/userRoutes.js";
+// import { Configuration, OpenAIApi } from "openai";
 
 const app = express();
 dotenv.config();
@@ -20,7 +20,7 @@ app.use(cors());
 
 const PORT = process.env.PORT || 8000;
 
-app.use("/", userRoutes);
+app.use("/api", userRoutes);
 
 // app.post("/api/register", async (req, res) => {
 //   try {
@@ -87,7 +87,5 @@ app.use("/", userRoutes);
 //   }
 // });
 
-connectionDB()
-  .then()
-  .catch((error) => console);
+connectionDB().catch((error) => console.error(error));
 app.listen(PORT, () => console.log(`listening on ${PORT}`));

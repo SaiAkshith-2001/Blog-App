@@ -9,6 +9,16 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minlength: 6,
     },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      match: [
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        "Please fill a valid email address",
+      ],
+    },
     password: { type: String, required: true, minlength: 8 },
     role: {
       type: String,
@@ -20,9 +30,8 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true, collection: "users" }
 );
-//password hashing
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   try {
