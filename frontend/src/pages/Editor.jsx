@@ -33,6 +33,7 @@ import CommentRoundedIcon from "@mui/icons-material/CommentRounded";
 import ShowChartRoundedIcon from "@mui/icons-material/ShowChartRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import { Close } from "@mui/icons-material";
 const modules = {
   toolbar: [
     [{ header: "1" }, { header: "2" }, { font: [] }],
@@ -411,9 +412,23 @@ const NoteEditor = () => {
         open={snackbar.open}
         autoHideDuration={3000}
         onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
       >
-        <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+        <Alert
+          severity={snackbar.severity}
+          sx={{ width: "100%", display: "flex", alignItems: "center" }}
+        >
           {snackbar.message}
+          {
+            <IconButton
+              onClick={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+            >
+              <Close />
+            </IconButton>
+          }
         </Alert>
       </Snackbar>
       <StyledFab color="primary" aria-label="add">

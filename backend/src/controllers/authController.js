@@ -79,8 +79,8 @@ export const login = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
-        refreshToken: generateToken(user._id),
       },
+      refreshToken: generateToken(user._id),
     });
     await user.save();
   } catch (error) {

@@ -16,11 +16,21 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Close } from "@mui/icons-material";
 
 const registrationValidationSchema = Yup.object({
   username: Yup.string()
     .required("Username is required")
     .min(6, "Username should be of minimum 6 characters length"),
+  email: Yup.string()
+    .required("email is required")
+    .email("Invalid email format")
+    .lowercase("Email must be lowercase")
+    .trim("Remove extra spaces")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      "Email contains invalid characters"
+    ),
   password: Yup.string()
     .required("Password is required")
     .min(8, "Password should be of minimum 8 characters length"),
@@ -56,6 +66,7 @@ const Register = () => {
   const onSubmit = async (data) => {
     try {
       const response = await axios.post("http://localhost:5000/api/register", {
+        email: data.email,
         username: data.username,
         password: data.password,
       });
@@ -99,6 +110,16 @@ const Register = () => {
             error={Boolean(errors.username)}
             helperText={errors.username?.message}
             autoFocus
+          />
+          <TextField
+            label="Email"
+            name="email"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            {...register("email")}
+            error={Boolean(errors.email)}
+            helperText={errors.email?.message}
           />
           <TextField
             name="password"
@@ -153,9 +174,25 @@ const Register = () => {
             open={snackbar.open}
             autoHideDuration={3000}
             onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
           >
-            <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+            <Alert
+              severity={snackbar.severity}
+              sx={{ width: "100%", display: "flex", alignItems: "center" }}
+            >
               {snackbar.message}
+              {
+                <IconButton
+                  onClick={() =>
+                    setSnackbar((prev) => ({ ...prev, open: false }))
+                  }
+                >
+                  <Close />
+                </IconButton>
+              }
             </Alert>
           </Snackbar>
         </form>

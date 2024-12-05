@@ -17,6 +17,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Close } from "@mui/icons-material";
 
 const loginValidationSchema = Yup.object().shape({
   username: Yup.string()
@@ -35,8 +36,8 @@ const Login = () => {
   } = useForm({
     resolver: yupResolver(loginValidationSchema),
   });
-  const [showPassword, setShowPassword] = useState(false);
   const { login } = useContext(AuthContext);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -54,7 +55,7 @@ const Login = () => {
         username: data.username,
         password: data.password,
       });
-      login(response.data.accessToken);
+      login(response.data.refreshToken);
       if (response.data && response.status === 200) {
         setSnackbar({
           open: true,
@@ -155,9 +156,25 @@ const Login = () => {
             open={snackbar.open}
             autoHideDuration={3000}
             onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
           >
-            <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+            <Alert
+              severity={snackbar.severity}
+              sx={{ width: "100%", display: "flex", alignItems: "center" }}
+            >
               {snackbar.message}
+              {
+                <IconButton
+                  onClick={() =>
+                    setSnackbar((prev) => ({ ...prev, open: false }))
+                  }
+                >
+                  <Close />
+                </IconButton>
+              }
             </Alert>
           </Snackbar>
         </form>

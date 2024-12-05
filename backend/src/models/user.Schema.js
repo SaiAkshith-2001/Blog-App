@@ -43,7 +43,7 @@ userSchema.pre("save", async function (next) {
     return next(error);
   }
 });
-// Method to check password validity
+// our own custom document instance methods to check password validity
 userSchema.methods.isValidPassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };

@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import "react-quill/dist/quill.snow.css";
+import { Close } from "@mui/icons-material";
 const ReactQuill = lazy(() => import("react-quill"));
 const DeleteIcon = lazy(() => import("@mui/icons-material/Delete"));
 const EditIcon = lazy(() => import("@mui/icons-material/Edit"));
@@ -352,9 +353,23 @@ const BlogWrite = () => {
         open={snackbar.open}
         autoHideDuration={3000}
         onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
       >
-        <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+        <Alert
+          severity={snackbar.severity}
+          sx={{ width: "100%", display: "flex", alignItems: "center" }}
+        >
           {snackbar.message}
+          {
+            <IconButton
+              onClick={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+            >
+              <Close />
+            </IconButton>
+          }
         </Alert>
       </Snackbar>
     </>
