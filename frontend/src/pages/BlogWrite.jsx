@@ -20,10 +20,12 @@ import {
   Paper,
   CardMedia,
   Avatar,
+  Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import "react-quill/dist/quill.snow.css";
 import { Close } from "@mui/icons-material";
+import axios from "axios";
 const ReactQuill = lazy(() => import("react-quill"));
 const DeleteIcon = lazy(() => import("@mui/icons-material/Delete"));
 const EditIcon = lazy(() => import("@mui/icons-material/Edit"));
@@ -36,28 +38,9 @@ const StyledCard = styled(Card)(() => ({
     transform: "scale(1.03)",
   },
 }));
-
 const StyledCardContent = styled(CardContent)({
   flexGrow: 1,
 });
-// const DeleteDialog = ({ open, onClose, onConfirm }) => {
-//   return (
-//     <Dialog open={} onClose={}>
-//       <DialogTitle>Confirm Delete</DialogTitle>
-//       <DialogContent>
-//         <Typography>Are you sure you want to delete this post?</Typography>
-//       </DialogContent>
-//       <DialogActions>
-//         <Button onClick={onClose} color="primary" variant="contained">
-//           Cancel
-//         </Button>
-//         <Button onClick={onConfirm} color="error" variant="outlined">
-//           Delete
-//         </Button>
-//       </DialogActions>
-//     </Dialog>
-//   );
-// };
 const BlogPost = ({ post, onEdit, onDelete }) => (
   <StyledCard>
     <CardMedia
@@ -98,12 +81,16 @@ const BlogPost = ({ post, onEdit, onDelete }) => (
       </Typography>
     </StyledCardContent>
     <CardActions>
-      <IconButton aria-label="edit" onClick={() => onEdit(post)}>
-        <EditIcon />
-      </IconButton>
-      <IconButton aria-label="delete" onClick={() => onDelete(post.id)}>
-        <DeleteIcon />
-      </IconButton>
+      <Tooltip title="Edit" arrow>
+        <IconButton aria-label="edit" onClick={() => onEdit(post)}>
+          <EditIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Delete" arrow>
+        <IconButton aria-label="delete" onClick={() => onDelete(post.id)}>
+          <DeleteIcon />
+        </IconButton>
+      </Tooltip>
     </CardActions>
   </StyledCard>
 );
@@ -147,36 +134,67 @@ const BlogWrite = () => {
       console.error("Error in fetching data, Please try again later!", err);
     }
   };
-
   useEffect(() => {
     getNews();
   }, []);
-
-  const handleCreatePost = () => {
-    if (
-      newPost.title.trim() === "" ||
-      !newPost.body ||
-      newPost.author.trim() === ""
-    ) {
-      setError(true);
-      setHelperText("this is required field");
+  const handleCreatePost = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/write", {
+        title: newPost.title,
+        author: newPost.author,
+        body: newPost.body,
+      });
+      console.log(response.data);
+      const post = { ...newPost, id: Date.now() };
+      setPosts((prev) => [post, ...prev]);
+      setNewPost({ title: "", body: "", author: "" });
       setSnackbar({
         open: true,
-        message: "Please fill all fields",
-        severity: "error",
+        message: "Post created successfully!",
+        severity: "success",
       });
-      return;
+      setError(false);
+      setHelperText("");
+    } catch (error) {
+      console.error("Something went wrong", error);
+      if (error.response && error.response.status === 400) {
+        setSnackbar({
+          open: true,
+          message: "Please fill all fields!",
+          severity: "error",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: "Something went wrong Please try again later!",
+          severity: "error",
+        });
+      }
     }
-    const post = { ...newPost, id: Date.now() };
-    setPosts((prev) => [post, ...prev]);
-    setNewPost({ title: "", body: "", author: "" });
-    setSnackbar({
-      open: true,
-      message: "Post created successfully",
-      severity: "success",
-    });
-    setError(false);
-    setHelperText("");
+    // if (
+    //   newPost.title.trim() === "" ||
+    //   !newPost.body ||
+    //   newPost.author.trim() === ""
+    // ) {
+    //   setError(true);
+    //   setHelperText("this is required field");
+    //   setSnackbar({
+    //     open: true,
+    //     message: "Please fill all fields",
+    //     severity: "error",
+    //   });
+    //   return;
+    // }
+    // const post = { ...newPost, id: Date.now() };
+    // setPosts((prev) => [post, ...prev]);
+    // setNewPost({ title: "", body: "", author: "" });
+    // setSnackbar({
+    //   open: true,
+    //   message: "Post created successfully",
+    //   severity: "success",
+    // });
+    // setError(false);
+    // setHelperText("");
   };
 
   const handlePostDelete = (id) => {

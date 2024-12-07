@@ -8,6 +8,7 @@ import {
   Snackbar,
   IconButton,
   Alert,
+  Tooltip,
 } from "@mui/material";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -77,12 +78,26 @@ const Register = () => {
         severity: "success",
       });
     } catch (error) {
-      console.error("Registration failed", error);
-      setSnackbar({
-        open: true,
-        message: "Invalid user, Please verify your credentials!",
-        severity: "error",
-      });
+      console.error("Login failed", error);
+      if (error.response && error.response.status === 401) {
+        setSnackbar({
+          open: true,
+          message: "Invalid password, Please verify!",
+          severity: "error",
+        });
+      } else if (error.response && error.response.status === 404) {
+        setSnackbar({
+          open: true,
+          message: "User does not exists!",
+          severity: "error",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: "Something went wrong Please try again later!",
+          severity: "error",
+        });
+      }
     }
   };
 
@@ -133,9 +148,11 @@ const Register = () => {
             helperText={errors.password?.message}
             InputProps={{
               endAdornment: (
-                <IconButton onClick={handleShowPassword}>
-                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                </IconButton>
+                <Tooltip title={showPassword ? "Hide" : "Show"} arrow>
+                  <IconButton onClick={handleShowPassword}>
+                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </IconButton>
+                </Tooltip>
               ),
             }}
           />
@@ -200,5 +217,4 @@ const Register = () => {
     </Container>
   );
 };
-
 export default Register;

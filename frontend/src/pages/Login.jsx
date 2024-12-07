@@ -12,6 +12,7 @@ import {
   Box,
   IconButton,
   Alert,
+  Tooltip,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -127,9 +128,11 @@ const Login = () => {
             helperText={errors.password?.message}
             InputProps={{
               endAdornment: (
-                <IconButton onClick={handleShowPassword}>
-                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                </IconButton>
+                <Tooltip title={showPassword ? "Hide" : "Show"} arrow>
+                  <IconButton onClick={handleShowPassword}>
+                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </IconButton>
+                </Tooltip>
               ),
             }}
           />

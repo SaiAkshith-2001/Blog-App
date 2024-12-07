@@ -17,6 +17,7 @@ import {
   Typography,
   Menu,
   MenuItem,
+  Tooltip,
 } from "@mui/material";
 import LoadingBar from "react-top-loading-bar";
 import { AuthContext } from "./context/AuthContext";
@@ -35,7 +36,6 @@ const BlogPost = lazy(() => import("./pages/BlogPost"));
 const Insights = lazy(() => import("./pages/Insights"));
 const BlogWrite = lazy(() => import("./pages/BlogWrite"));
 const ThemeToggleButton = lazy(() => import("./component/ToggleButton"));
-
 const MenuIcon = lazy(() => import("@mui/icons-material/Menu"));
 const PersonIcon = lazy(() => import("@mui/icons-material/Person"));
 function App(props) {
@@ -135,15 +135,17 @@ function App(props) {
         />
         <AppBar component="nav" position="static">
           <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { sm: "none" } }}
-            >
-              <MenuIcon />
-            </IconButton>
+            <Tooltip title="Menu" arrow>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleDrawerToggle}
+                sx={{ mr: 2, display: { sm: "none" } }}
+              >
+                <MenuIcon />
+              </IconButton>
+            </Tooltip>
             <Typography component="div" sx={{ flexGrow: 1 }}>
               <Button
                 disableRipple
@@ -209,9 +211,11 @@ function App(props) {
                 About
               </Button>
             </Box>
-            <IconButton color="inherit" onClick={handleMenuOpen}>
-              <PersonIcon />
-            </IconButton>
+            <Tooltip title="Profile" arrow>
+              <IconButton color="inherit" onClick={handleMenuOpen}>
+                <PersonIcon />
+              </IconButton>
+            </Tooltip>
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}

@@ -6,18 +6,18 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-function Modal({ handleDelete }) {
+function Modal({ open, setOpen, dialog, handlerFunction }) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
-      <DialogTitle>Delete Confirmation</DialogTitle>
-      <DialogContent>Are you sure you want to delete this item?</DialogContent>
+      <DialogTitle>{dialog.title}</DialogTitle>
+      <DialogContent>{dialog.content}</DialogContent>
       <DialogActions>
         <Button variant="contained" onClick={() => setOpen(false)}>
           Cancel
         </Button>
-        <Button variant="outlined" color="error" onClick={handleDelete}>
-          Delete
+        <Button variant="outlined" color="error" onClick={handlerFunction}>
+          {dialog.btnName}
         </Button>
       </DialogActions>
     </Dialog>

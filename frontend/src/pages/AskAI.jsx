@@ -6,6 +6,7 @@ import {
   Box,
   IconButton,
   Paper,
+  Tooltip,
 } from "@mui/material";
 import axios from "axios";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
@@ -47,9 +48,11 @@ const AskAI = () => {
             autoFocus
             InputProps={{
               endAdornment: (
-                <IconButton color="primary" type="submit">
-                  <SendRoundedIcon />
-                </IconButton>
+                <Tooltip title="Send" arrow>
+                  <IconButton color="primary" type="submit">
+                    <SendRoundedIcon />
+                  </IconButton>
+                </Tooltip>
               ),
             }}
           />

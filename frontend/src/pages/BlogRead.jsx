@@ -13,6 +13,7 @@ import {
   Box,
   IconButton,
   CardMedia,
+  Tooltip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
@@ -130,13 +131,15 @@ const BlogRead = () => {
                     </Typography>
                   </StyledCardContent>
                   <CardActions>
-                    <IconButton
-                      aria-label="comments"
-                      component={Link}
-                      to={`/posts/${item.id}`}
-                    >
-                      <CommentRoundedIcon />
-                    </IconButton>
+                    <Tooltip title="comment" arrow>
+                      <IconButton
+                        aria-label="comments"
+                        component={Link}
+                        to={`/posts/${item.id}`}
+                      >
+                        <CommentRoundedIcon />
+                      </IconButton>
+                    </Tooltip>
                   </CardActions>
                 </StyledCard>
               </Grid>
@@ -149,9 +152,11 @@ const BlogRead = () => {
         )}
       </Container>
       <StyledFab color="primary" aria-label="add">
-        <IconButton color="inherit" component={Link} to="/write">
-          <AddIcon />
-        </IconButton>
+        <Tooltip title="New Post" arrow>
+          <IconButton color="inherit" component={Link} to="/write">
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
       </StyledFab>
     </Container>
   );

@@ -25,6 +25,7 @@ import {
   DialogContent,
   DialogActions,
   InputAdornment,
+  Tooltip,
 } from "@mui/material";
 import { useNavigate, Link } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
@@ -36,36 +37,42 @@ import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import { Close } from "@mui/icons-material";
 const modules = {
   toolbar: [
-    [{ header: "1" }, { header: "2" }, { font: [] }],
-    [{ size: [] }],
-    ["bold", "italic", "underline", "strike", "blockquote"],
-    [
-      { list: "ordered" },
-      { list: "bullet" },
-      { indent: "-1" },
-      { indent: "+1" },
-    ],
-    ["link", "image", "video"],
-    ["clean"],
+    ["bold", "italic", "underline", "strike"], // toggled buttons
+    ["blockquote", "code-block"],
+    ["link", "image", "video", "formula"],
+    [{ header: 1 }, { header: 2 }], // custom button values
+    [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+    [{ script: "sub" }, { script: "super" }], // superscript/subscript
+    [{ indent: "-2" }, { indent: "+2" }], // outdent/indent
+    // [{ direction: "rtl" }], // text direction
+
+    [{ size: ["small", false, "large", "huge"] }], // custom dropdown
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+    [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+    [{ font: [] }],
+    [{ align: [] }],
+
+    ["clean"], // remove formatting button
   ],
 };
 
-const formats = [
-  "header",
-  "font",
-  "size",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "blockquote",
-  "list",
-  "bullet",
-  "indent",
-  "link",
-  "image",
-  "video",
-];
+// const formats = [
+//   "header",
+//   "font",
+//   "size",
+//   "bold",
+//   "italic",
+//   "underline",
+//   "strike",
+//   "blockquote",
+//   "list",
+//   "bullet",
+//   "indent",
+//   "link",
+//   "image",
+//   "video",
+// ];
 const StyledFab = styled(Fab)(({ theme }) => ({
   position: "fixed",
   bottom: theme.spacing(2),
@@ -133,26 +140,36 @@ const BlogPost = ({ post, onEdit, onDelete, onComment, onOpenInsights }) => {
         </Typography>
       </StyledCardContent>
       <CardActions>
-        <IconButton aria-label="like" onClick={() => setIsLiked(!isLiked)}>
-          <FavoriteRoundedIcon sx={{ color: isLiked ? "red" : "null" }} />
-        </IconButton>
-        <IconButton
-          aria-label="comment"
-          onClick={() => setShowComments(!showComments)}
-        >
-          <Badge badgeContent={post.comments.length} color="error">
-            <CommentRoundedIcon />
-          </Badge>
-        </IconButton>
-        <IconButton aria-label="edit" onClick={() => onEdit(post)}>
-          <EditIcon />
-        </IconButton>
-        <IconButton aria-label="delete" onClick={() => onDelete(post.id)}>
-          <DeleteIcon />
-        </IconButton>
-        <IconButton aria-label="charts" onClick={() => onOpenInsights(post)}>
-          <ShowChartRoundedIcon />
-        </IconButton>
+        <Tooltip title="Like" arrow>
+          <IconButton aria-label="like" onClick={() => setIsLiked(!isLiked)}>
+            <FavoriteRoundedIcon sx={{ color: isLiked ? "red" : "null" }} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Comment" arrow>
+          <IconButton
+            aria-label="comment"
+            onClick={() => setShowComments(!showComments)}
+          >
+            <Badge badgeContent={post.comments.length} color="error">
+              <CommentRoundedIcon />
+            </Badge>
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Edit" arrow>
+          <IconButton aria-label="edit" onClick={() => onEdit(post)}>
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete" arrow>
+          <IconButton aria-label="delete" onClick={() => onDelete(post.id)}>
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Charts" arrow>
+          <IconButton aria-label="charts" onClick={() => onOpenInsights(post)}>
+            <ShowChartRoundedIcon />
+          </IconButton>
+        </Tooltip>
       </CardActions>
       {showComments && (
         <CardContent>
@@ -341,7 +358,7 @@ const NoteEditor = () => {
             value={content}
             onChange={handleChange}
             modules={modules}
-            formats={formats}
+            // formats={formats}
             placeholder="Write your post content here..."
             sx={{ my: "2rem" }}
           />
@@ -432,9 +449,11 @@ const NoteEditor = () => {
         </Alert>
       </Snackbar>
       <StyledFab color="primary" aria-label="add">
-        <IconButton color="inherit" component={Link} to="/askai">
-          <AutoAwesomeRoundedIcon />
-        </IconButton>
+        <Tooltip title="Ask AI" arrow>
+          <IconButton color="inherit" component={Link} to="/askai">
+            <AutoAwesomeRoundedIcon />
+          </IconButton>
+        </Tooltip>
       </StyledFab>
     </Container>
   );
