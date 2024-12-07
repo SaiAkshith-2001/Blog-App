@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { connectionDB } from "./src/config/db.js";
 import userRoutes from "./src/routes/userRoutes.js";
+import postRoutes from "./src/routes/postRoutes.js";
 // import { Configuration, OpenAIApi } from "openai";
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(cors());
 const PORT = process.env.PORT || 8000;
 
 app.use("/api", userRoutes);
+app.use("/api", postRoutes);
 
 // app.post("/api/register", async (req, res) => {
 //   try {
@@ -50,7 +52,6 @@ app.use("/api", userRoutes);
 //     res.status(500).json({ message: "Internal server error" });
 //   }
 // });
-
 // const verify = async (req, res, next) => {
 //   const authHeaders = req.headers.authorization;
 //   if (authHeaders) {
@@ -86,6 +87,5 @@ app.use("/api", userRoutes);
 //     res.status(500).json({ message: error.message });
 //   }
 // });
-
 connectionDB().catch((error) => console.error(error));
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
