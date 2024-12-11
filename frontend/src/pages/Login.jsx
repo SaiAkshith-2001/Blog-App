@@ -1,24 +1,22 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { AuthContext } from "../context/AuthContext";
 import * as Yup from "yup";
 import {
   TextField,
   Button,
   Container,
   Typography,
-  Snackbar,
   Box,
   IconButton,
-  Alert,
   Tooltip,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Close } from "@mui/icons-material";
+import { AuthContext } from "../context/AuthContext";
+import { SnackbarContext } from "../context/SnackbarContext";
 
 const loginValidationSchema = Yup.object().shape({
   username: Yup.string()
@@ -38,13 +36,9 @@ const Login = () => {
     resolver: yupResolver(loginValidationSchema),
   });
   const { login } = useContext(AuthContext);
+  const { setSnackbar } = useContext(SnackbarContext);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -70,7 +64,7 @@ const Login = () => {
       if (error.response && error.response.status === 401) {
         setSnackbar({
           open: true,
-          message: "Invalid password, Please verify!",
+          message: "Invalid username (or) password , Please verify!",
           severity: "error",
         });
       } else if (error.response && error.response.status === 404) {
@@ -155,31 +149,6 @@ const Login = () => {
           >
             Create an account/Sign up
           </Button>
-          <Snackbar
-            open={snackbar.open}
-            autoHideDuration={3000}
-            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-          >
-            <Alert
-              severity={snackbar.severity}
-              sx={{ width: "100%", display: "flex", alignItems: "center" }}
-            >
-              {snackbar.message}
-              {
-                <IconButton
-                  onClick={() =>
-                    setSnackbar((prev) => ({ ...prev, open: false }))
-                  }
-                >
-                  <Close />
-                </IconButton>
-              }
-            </Alert>
-          </Snackbar>
         </form>
       </Box>
     </Container>

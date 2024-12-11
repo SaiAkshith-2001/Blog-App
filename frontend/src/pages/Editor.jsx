@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import {
-  Alert,
   Avatar,
   Box,
   Badge,
@@ -16,7 +15,6 @@ import {
   Fab,
   IconButton,
   Paper,
-  Snackbar,
   styled,
   TextField,
   Typography,
@@ -34,7 +32,8 @@ import CommentRoundedIcon from "@mui/icons-material/CommentRounded";
 import ShowChartRoundedIcon from "@mui/icons-material/ShowChartRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
-import { Close } from "@mui/icons-material";
+import { SnackbarContext } from "../context/SnackbarContext";
+
 const modules = {
   toolbar: [
     ["bold", "italic", "underline", "strike"], // toggled buttons
@@ -212,11 +211,8 @@ const NoteEditor = () => {
   const [posts, setPosts] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  const { setSnackbar } = useContext(SnackbarContext);
+
   const navigate = useNavigate();
   useEffect(() => {
     const savedPosts = localStorage.getItem("posts");
@@ -425,29 +421,6 @@ const NoteEditor = () => {
           <Button onClick={handleUpdatePost}>Save</Button>
         </DialogActions>
       </Dialog>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-      >
-        <Alert
-          severity={snackbar.severity}
-          sx={{ width: "100%", display: "flex", alignItems: "center" }}
-        >
-          {snackbar.message}
-          {
-            <IconButton
-              onClick={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-            >
-              <Close />
-            </IconButton>
-          }
-        </Alert>
-      </Snackbar>
       <StyledFab color="primary" aria-label="add">
         <Tooltip title="Ask AI" arrow>
           <IconButton color="inherit" component={Link} to="/askai">

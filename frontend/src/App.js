@@ -66,7 +66,7 @@ function App(props) {
             component={Link}
             to="/read"
           >
-            <ListItemText>Read Blogs</ListItemText>
+            <ListItemText>Feed</ListItemText>
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
@@ -139,9 +139,11 @@ function App(props) {
               <IconButton
                 color="inherit"
                 aria-label="open drawer"
-                edge="start"
                 onClick={handleDrawerToggle}
-                sx={{ mr: 2, display: { sm: "none" } }}
+                sx={{
+                  mr: 2,
+                  display: { sm: "none" },
+                }}
               >
                 <MenuIcon />
               </IconButton>
@@ -184,23 +186,23 @@ function App(props) {
                 to="/read"
                 onClick={() => setProgress(100)}
               >
-                Read
+                Feed
               </Button>
-              <Button
+              {/* <Button
                 color="inherit"
                 component={Link}
                 to="/editor"
                 onClick={() => setProgress(100)}
               >
                 Editor
-              </Button>
+              </Button> */}
               <Button
                 color="inherit"
                 component={Link}
                 to="/md"
                 onClick={() => setProgress(100)}
               >
-                Content
+                Editor
               </Button>
               <Button
                 color="inherit"

@@ -1,13 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Container,
   TextField,
   Button,
   Box,
   Typography,
-  Snackbar,
   IconButton,
-  Alert,
   Tooltip,
 } from "@mui/material";
 import * as Yup from "yup";
@@ -17,7 +15,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Close } from "@mui/icons-material";
+import { SnackbarContext } from "../context/SnackbarContext";
 
 const registrationValidationSchema = Yup.object({
   username: Yup.string()
@@ -41,11 +39,7 @@ const registrationValidationSchema = Yup.object({
 });
 
 const Register = () => {
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  const { setSnackbar } = useContext(SnackbarContext);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const {
@@ -82,7 +76,7 @@ const Register = () => {
       if (error.response && error.response.status === 401) {
         setSnackbar({
           open: true,
-          message: "Invalid password, Please verify!",
+          message: "Invalid username (or) password , Please verify!",
           severity: "error",
         });
       } else if (error.response && error.response.status === 404) {
@@ -187,31 +181,6 @@ const Register = () => {
               Sign In
             </Button>
           </Typography>
-          <Snackbar
-            open={snackbar.open}
-            autoHideDuration={3000}
-            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-          >
-            <Alert
-              severity={snackbar.severity}
-              sx={{ width: "100%", display: "flex", alignItems: "center" }}
-            >
-              {snackbar.message}
-              {
-                <IconButton
-                  onClick={() =>
-                    setSnackbar((prev) => ({ ...prev, open: false }))
-                  }
-                >
-                  <Close />
-                </IconButton>
-              }
-            </Alert>
-          </Snackbar>
         </form>
       </Box>
     </Container>

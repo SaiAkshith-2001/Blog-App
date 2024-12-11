@@ -9,6 +9,7 @@ export const ThemeContext = createContext();
 
 const ThemeProvider = ({ children }) => {
   const [darkMode, setDarkMode] = useState(false);
+  const [rotate, setRotate] = useState(false);
 
   const theme = useMemo(
     () =>
@@ -22,10 +23,11 @@ const ThemeProvider = ({ children }) => {
 
   const toggleTheme = () => {
     setDarkMode(!darkMode);
+    setRotate(!rotate);
   };
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ darkMode, toggleTheme, rotate }}>
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
         {children}

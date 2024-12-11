@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy } from "react";
+import React, { useState, useEffect, lazy, useContext } from "react";
 import {
   Typography,
   Container,
@@ -13,9 +13,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  Snackbar,
   CircularProgress,
-  Alert,
   Box,
   Paper,
   CardMedia,
@@ -24,11 +22,12 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import "react-quill/dist/quill.snow.css";
-import { Close } from "@mui/icons-material";
+import { SnackbarContext } from "../context/SnackbarContext";
 import axios from "axios";
 const ReactQuill = lazy(() => import("react-quill"));
 const DeleteIcon = lazy(() => import("@mui/icons-material/Delete"));
 const EditIcon = lazy(() => import("@mui/icons-material/Edit"));
+
 const StyledCard = styled(Card)(() => ({
   height: "100%",
   display: "flex",
@@ -41,6 +40,49 @@ const StyledCard = styled(Card)(() => ({
 const StyledCardContent = styled(CardContent)({
   flexGrow: 1,
 });
+const modules = {
+  toolbar: [
+    ["bold", "italic", "underline", "strike"],
+    ["blockquote", "code-block"],
+    ["link", "image", "video", "formula"],
+    [{ header: 1 }, { header: 2 }],
+    [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+    [{ script: "sub" }, { script: "super" }], // superscript/subscript
+    [{ indent: "-2" }, { indent: "+2" }],
+    // [{ direction: "rtl" }], // text direction
+    [{ size: ["small", false, "large", "huge"] }], // custom dropdown
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+    [{ font: [] }],
+    [{ align: [] }],
+    ["clean"], // remove formatting button
+  ],
+};
+function stringToColor(string) {
+  let hash = 0;
+  let i;
+  /* eslint-disable no-bitwise */
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let color = "#";
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+  /* eslint-enable no-bitwise */
+  return color;
+}
+
+function stringAvatar(name) {
+  return {
+    sx: {
+      mr: 1,
+      bgcolor: stringToColor(name),
+    },
+    children: `${name.split(" ")[0][0]}${name?.split(" ")[1]?.[0] || ""}`,
+  };
+}
 const BlogPost = ({ post, onEdit, onDelete }) => (
   <StyledCard>
     <CardMedia
@@ -53,23 +95,17 @@ const BlogPost = ({ post, onEdit, onDelete }) => (
       <Typography gutterBottom variant="h5" component="div">
         {post.title}
       </Typography>
-      {!post.author ? (
-        ""
-      ) : (
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Avatar sx={{ width: 24, height: 24, mr: 1 }}>
-            {post.author[0]}
-          </Avatar>
-          <Typography
-            color="textSecondary"
-            sx={{ fontStyle: "italic" }}
-            gutterBottom
-          >
-            By {post.author}
-          </Typography>
-        </Box>
-      )}
-      <Typography variant="body2" color="text.secondary">
+      <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Avatar {...stringAvatar(post.author)} />
+        <Typography
+          color="textSecondary"
+          sx={{ fontStyle: "italic" }}
+          gutterBottom
+        >
+          By {post.author}
+        </Typography>
+      </Box>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
         {post.body.replace(/<\/?[^>]+(>|$)/g, "")}
       </Typography>
       <Typography
@@ -77,7 +113,7 @@ const BlogPost = ({ post, onEdit, onDelete }) => (
         color="text.secondary"
         sx={{ mt: 1, display: "block" }}
       >
-        {!post.id ? "" : new Date(post?.id).toLocaleDateString()}
+        {/* {post.createdAt} */}
       </Typography>
     </StyledCardContent>
     <CardActions>
@@ -94,12 +130,11 @@ const BlogPost = ({ post, onEdit, onDelete }) => (
     </CardActions>
   </StyledCard>
 );
-
 const BlogWrite = () => {
+  const { setSnackbar } = useContext(SnackbarContext);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
   const [error, setError] = useState(false);
@@ -109,55 +144,60 @@ const BlogWrite = () => {
     author: "",
     body: "",
   });
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-  const getNews = async () => {
+  const fetchPosts = async () => {
     setIsLoading(true);
+    // try {
+    //   const response = await fetch(
+    //     `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=10`
+    //   );
+    //   const data = await response.json();
+    //   //console.log(data);
+    //   if (!response.ok) {
+    //     throw new Error("please try again!");
+    //   } else {
+    //     setIsLoading(false);
+    //     setPosts((prevData) => [...prevData, ...data]);
+    //   }
+    // } catch (err) {
+    //   setIsLoading(false);
+    //   console.error("Error in fetching data, Please try again later!", err);
+    // }
     try {
-      const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=10`
-      );
-      const data = await response.json();
-      //console.log(data);
-      if (!response.ok) {
-        throw new Error("please try again!");
-      } else {
-        setIsLoading(false);
-        setPage((prevPage) => prevPage + 1);
-        setPosts((prevData) => [...prevData, ...data]);
-      }
-    } catch (err) {
+      const response = await axios.get("http://localhost:5000/api/write");
+      const data = response.data.posts;
       setIsLoading(false);
-      console.error("Error in fetching data, Please try again later!", err);
+      setPosts([...data]);
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error in fetching data, Please try again later!", error);
     }
   };
   useEffect(() => {
-    getNews();
+    fetchPosts();
   }, []);
   const handleCreatePost = async () => {
     try {
       const response = await axios.post("http://localhost:5000/api/write", {
         title: newPost.title,
         author: newPost.author,
-        body: newPost.body,
+        body: newPost.body.replace(/<\/?[^>]+(>|$)/g, ""),
       });
-      console.log(response.data);
+      // console.log(response.data);
       const post = { ...newPost, id: Date.now() };
       setPosts((prev) => [post, ...prev]);
-      setNewPost({ title: "", body: "", author: "" });
       setSnackbar({
         open: true,
         message: "Post created successfully!",
         severity: "success",
       });
+      setNewPost({ title: "", body: "", author: "" });
       setError(false);
       setHelperText("");
     } catch (error) {
       console.error("Something went wrong", error);
       if (error.response && error.response.status === 400) {
+        setError(true);
+        setHelperText("this is required field");
         setSnackbar({
           open: true,
           message: "Please fill all fields!",
@@ -238,11 +278,9 @@ const BlogWrite = () => {
     const { name, value } = e.target;
     setNewPost((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleContentChange = (body) => {
     setNewPost((prev) => ({ ...prev, body }));
   };
-
   return (
     <>
       <Container sx={{ py: 8, my: 4 }} maxWidth="md">
@@ -272,6 +310,7 @@ const BlogWrite = () => {
           />
           <ReactQuill
             theme="snow"
+            modules={modules}
             required
             value={newPost.body}
             onChange={handleContentChange}
@@ -344,12 +383,12 @@ const BlogWrite = () => {
             helperText={editingPost?.title === "" ? helperText : null}
           />
           <TextField
-            fullWidth
             label="Author"
             value={editingPost?.author}
             onChange={(e) =>
               setEditingPost((prev) => ({ ...prev, author: e.target.value }))
             }
+            fullWidth
             margin="normal"
             required
             error={editingPost?.author === "" ? error : null}
@@ -367,29 +406,6 @@ const BlogWrite = () => {
           <Button onClick={handleUpdatePost}>Save</Button>
         </DialogActions>
       </Dialog>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-      >
-        <Alert
-          severity={snackbar.severity}
-          sx={{ width: "100%", display: "flex", alignItems: "center" }}
-        >
-          {snackbar.message}
-          {
-            <IconButton
-              onClick={() => setSnackbar((prev) => ({ ...prev, open: false }))}
-            >
-              <Close />
-            </IconButton>
-          }
-        </Alert>
-      </Snackbar>
     </>
   );
 };

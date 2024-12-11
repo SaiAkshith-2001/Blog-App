@@ -1,8 +1,15 @@
 import express from "express";
-import { createPost } from "../controllers/postController.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
+import {
+  createPost,
+  readAllPosts,
+  readPost,
+  readPostByAuthor,
+} from "../controllers/postController.js";
+// import { authMiddleware } from "../middlewares/authMiddleware.js";
 const router = express.Router();
-router.post("/write", createPost);
-router.get("/read");
+router.route("/write").post(createPost).get(readAllPosts).put(updatePost);
+// router.get("/read");
 // router.post("/write", authMiddleware, createPost);
+router.route("/read/:id").get(readPost);
+router.route("/read/user/name").get(readPostByAuthor);
 export default router;
