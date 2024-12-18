@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
+import { rateLimit } from "express-rate-limit";
 import { connectionDB } from "./src/config/db.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import postRoutes from "./src/routes/postRoutes.js";
@@ -13,6 +14,11 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+});
+
 // const configuration = new Configuration({
 //   apiKey: process.env.OPENAI_API_KEY,
 // });
@@ -21,6 +27,7 @@ app.use(cors());
 
 const PORT = process.env.PORT || 8000;
 
+app.use("/api", limiter);
 app.use("/api", userRoutes);
 app.use("/api", postRoutes);
 
