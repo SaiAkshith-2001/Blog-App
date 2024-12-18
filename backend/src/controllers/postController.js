@@ -89,6 +89,23 @@ export const updatePostById = async (req, res) => {
     });
   }
 };
+export const updatePostByIdPatch = async (req, res) => {
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(req.params.id, req.body, {
+      runValidators: true,
+      new: true,
+    });
+    res.json({
+      status: "Post successfully updated",
+      post: updatedPost,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
 export const deletePostById = async (req, res) => {
   try {
     const result = await Post.findByIdAndDelete(req.params.id, {
