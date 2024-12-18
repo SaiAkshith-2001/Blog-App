@@ -27,27 +27,10 @@ export const readAllPosts = async (req, res) => {
     });
   }
 };
-// /api/read/:id
-export const readPost = async (req, res) => {
+// /api/read/post/:id
+export const readPostById = async (req, res) => {
   try {
     const id = req.params.id;
-    const post = await Post.findOne({
-      _id: id,
-    });
-    res.json({
-      status: "success",
-      post: post,
-    });
-  } catch (error) {
-    res.status(400).json({
-      status: "error",
-      message: error.message,
-    });
-  }
-};
-
-export const updatePost = async (req, res) => {
-  try {
     const post = await Post.findOne({
       _id: id,
     });
@@ -73,6 +56,48 @@ export const readPostByAuthor = async (req, res) => {
     res.json({
       status: "success",
       post: post,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+export const updatePostById = async (req, res) => {
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(
+      req.params.id,
+      {
+        title: req.body.title,
+        body: req.body.body,
+        author: req.body.author,
+      },
+      {
+        runValidators: true,
+        new: true,
+      }
+    );
+    res.json({
+      status: "Post successfully updated",
+      post: updatedPost,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+export const deletePost = async (req, res) => {
+  try {
+    const title = req.params.title;
+    const result = await Post.deleteOne({
+      title: { $regex: title, $options: "i" },
+    });
+    res.json({
+      status: "Post successfully deleted",
+      data: result,
     });
   } catch (error) {
     res.status(400).json({

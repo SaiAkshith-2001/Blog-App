@@ -1,100 +1,204 @@
 import { User } from "../models/user.Schema.js";
-//  Get All Users
-// export const getAllUsers = async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     res.status(200).json({
-//       status: 'success',
-//       results: users.length,
-//       data: { users }
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       status: 'error',
-//       message: error.message
-//     });
-//   }
-// };
-// // Get User by ID
-// export const getUserById = async (req, res) => {
-//   try {
-//     const user = await User.findById(req.params.id);
-//     if (!user) {
-//       return res.status(404).json({
-//         status: 'fail',
-//         message: 'User not found'
-//       });
-//     }
-//     res.status(200).json({
-//       status: 'success',
-//       data: { user }
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       status: 'error',
-//       message: error.message
-//     });
-//   }
-// };
-// Create User
-export const createUser = async (req, res) => {
+import bcrypt from "bcryptjs";
+import { validationResult } from "express-validator";
+import { generateToken } from "../config/generateToken.js";
+export const register = async (req, res) => {
   try {
-    const newUser = await User.create(req.body);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+      });
+    }
+    const { username, email, password, role } = req.body;
+    let existingUser = await User.findOne({
+      $or: [{ email }, { username }],
+    });
+    if (existingUser) {
+      return res.status(400).json({
+        message: "User already exists with this email or username",
+      });
+    }
+    const newUser = new User({
+      username,
+      password,
+      email,
+      role: role || "user",
+      isActive: true,
+    });
+    await newUser.save();
     res.status(201).json({
-      status: "success",
-      data: { user: newUser },
+      message: "User registered successfully",
+      user: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+        role: newUser.role,
+      },
+      refreshToken: generateToken(newUser._id),
     });
   } catch (error) {
-    res.status(400).json({
-      status: "error",
-      message: error.message,
+    console.error("Registration error:", error);
+    res.status(500).json({
+      message: "Server error during registration",
+      error: error.message,
     });
   }
 };
-// // Update User
-// export const updateUser = async (req, res) => {
+export const login = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+      });
+    }
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid credentials",
+      });
+    }
+    if (!user.isActive) {
+      return res.status(403).json({
+        message: "Account is inactive. Contact support.",
+      });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        message: "Invalid credentials",
+      });
+    }
+    res.json({
+      message: "Login successful",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+      refreshToken: generateToken(user._id),
+    });
+    await user.save();
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({
+      message: "Server error during login",
+      error: error.message,
+    });
+  }
+};
+export const deleteUser = async (req, res) => {
+  try {
+    const username = req.params.username;
+    const removeUser = await User.deleteOne({ username: username });
+    res.json({
+      message: "user deleted successfully",
+    });
+  } catch (error) {
+    console.error("error occurred:", error);
+    res.status(500).json({
+      message: "Server error during deleting user",
+      error: error.message,
+    });
+  }
+};
+export const deleteAllInactiveUser = async (req, res) => {
+  try {
+    const removeAllInactiveUser = await User.deleteMany({
+      isActive: { $eq: false },
+    });
+    res.json({
+      message: "Inactive Users deleted successfully",
+    });
+  } catch (error) {
+    console.error("error occurred:", error);
+    res.status(500).json({
+      message: "Server error during deleting user",
+      error: error.message,
+    });
+  }
+};
+
+// const refreshToken = async (req, res) => {
 //   try {
-//     const updatedUser = await User.findByIdAndUpdate(
-//       req.params.id,
-//       req.body,
-//       { new: true, runValidators: true }
-//     );
-//     if (!updatedUser) {
-//       return res.status(404).json({
-//         status: 'fail',
-//         message: 'User not found'
+//     const { refreshToken } = req.body;
+//     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+//     const user = await User.findById(decoded.id);
+//     if (!user) {
+//       return res.status(401).json({
+//         message: "User not found",
 //       });
 //     }
-//     res.status(200).json({
-//       status: 'success',
-//       data: { user: updatedUser }
+//     if (user.refreshToken !== refreshToken) {
+//       return res.status(401).json({
+//         message: "Invalid refresh token",
+//       });
+//     }
+//     const newAccessToken = jwt.sign(
+//       {
+//         id: user._id,
+//         username: user.username,
+//         email: user.email,
+//         role: user.role,
+//       },
+//       process.env.JWT_SECRET,
+//       { expiresIn: "10m" }
+//     );
+//     res.json({
+//       accessToken: newAccessToken,
 //     });
 //   } catch (error) {
-//     res.status(400).json({
-//       status: 'error',
-//       message: error.message
+//     if (error.name === "JsonWebTokenError") {
+//       return res.status(401).json({
+//         message: "Invalid refresh token",
+//       });
+//     }
+//     res.status(500).json({
+//       message: "Server error during token refresh",
+//       error: error.message,
 //     });
 //   }
 // };
-// // Delete User
-// export const deleteUser = async (req, res) => {
+// const logout = async (req, res) => {
 //   try {
-//     const user = await User.findByIdAndDelete(req.params.id);
-
-//     if (!user) {
-//       return res.status(404).json({
-//         status: 'fail',
-//         message: 'User not found'
-//       });
+//     // Find user and clear refresh token
+//     const user = await User.findById(req.user.id);
+//     if (user) {
+//       user.refreshToken = null;
+//       await user.save();
 //     }
-//     res.status(204).json({
-//       status: 'success',
-//       data: null
+//     // Clear client-side tokens would be handled by frontend
+//     res.json({
+//       message: "Logout successful",
 //     });
 //   } catch (error) {
+//     console.error("Logout error:", error);
 //     res.status(500).json({
-//       status: 'error',
-//       message: error.message
+//       message: "Server error during logout",
+//       error: error.message,
+//     });
+//   }
+// };
+// const getUserProfile = async (req, res) => {
+//   try {
+//     // Fetch user details excluding password
+//     const user = await User.findById(req.user.id).select(
+//       "-password -refreshToken"
+//     );
+//     if (!user) {
+//       return res.status(404).json({
+//         message: "User not found",
+//       });
+//     }
+//     res.json(user);
+//   } catch (error) {
+//     console.error("Profile fetch error:", error);
+//     res.status(500).json({
+//       message: "Server error fetching profile",
+//       error: error.message,
 //     });
 //   }
 // };

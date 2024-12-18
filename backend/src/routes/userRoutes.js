@@ -1,30 +1,42 @@
 import express from "express";
-// import {
-// //   getAllUsers,
-// //   getUserById,
-// //   createUser,
-// //   updateUser,
-// //   deleteUser,
-// } from "../controllers/userController.js";
-// import { authMiddleware } from "../middlewares/authMiddleware.js";
-import { createUser } from "../controllers/userController.js";
-import { login } from "../controllers/authController.js";
+import { body } from "express-validator";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { login, register, deleteUser } from "../controllers/userController.js";
 const router = express.Router();
-
 // // GET all userss
 // router.get("/", authMiddleware, getAllUsers);
 
 // // GET user by ID
 // router.get("/:id", authMiddleware, getUserById);
 
-// // CREATE new user
-router.post("/register", createUser);
-router.post("/login", login);
+router.post(
+  "/register",
+  [
+    body("username")
+      .trim()
+      .isLength({ min: 6 })
+      .withMessage("Username must be at least 6 characters"),
+    body("email").isEmail().withMessage("Invalid email address"),
+    body("password")
+      .isLength({ min: 8 })
+      .withMessage("Password must be at least 8 characters"),
+  ],
+  register
+);
+
+router.post(
+  "/login",
+  [
+    body("username").notEmpty().withMessage("Invalid username address"),
+    body("password").notEmpty().withMessage("Password is required"),
+  ],
+  login
+);
 
 // // UPDATE user
 // router.put("/:id", authMiddleware, updateUser);
 
 // // DELETE user
-// router.delete("/:id", authMiddleware, deleteUser);
+router.delete("/:username", deleteUser);
 
 export default router;
