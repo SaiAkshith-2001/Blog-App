@@ -89,11 +89,11 @@ export const updatePostById = async (req, res) => {
     });
   }
 };
-export const deletePost = async (req, res) => {
+export const deletePostById = async (req, res) => {
   try {
-    const title = req.params.title;
-    const result = await Post.deleteOne({
-      title: { $regex: title, $options: "i" },
+    const result = await Post.findByIdAndDelete(req.params.id, {
+      runValidators: true,
+      new: true,
     });
     res.json({
       status: "Post successfully deleted",

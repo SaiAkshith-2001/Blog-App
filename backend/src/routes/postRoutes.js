@@ -5,13 +5,16 @@ import {
   readPostById,
   readPostByAuthor,
   updatePostById,
-  deletePost,
+  deletePostById,
 } from "../controllers/postController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 const router = express.Router();
 router.route("/write").post(createPost).get(readAllPosts);
 router.route("/read").get(readAllPosts);
-router.route("/read/post/:id").get(readPostById).put(updatePostById);
-router.route("/read/post/:title").delete(deletePost);
-router.route("/read/user/name").get(readPostByAuthor);
+router
+  .route("/read/post/:id")
+  .get(readPostById)
+  .put(updatePostById)
+  .delete(deletePostById);
+router.route("/read/user").get(readPostByAuthor);
 export default router;
