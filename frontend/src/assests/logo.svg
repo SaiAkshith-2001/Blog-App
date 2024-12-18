@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="blogGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3494E6"/>
+      <stop offset="100%" style="stop-color:#6B5B95"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background shape -->
+  <rect width="200" height="200" rx="40" fill="url(#blogGradient)"/>
+  
+  <!-- Open book/page symbol -->
+  <path 
+    d="M50 60 
+       Q100 40, 150 60 
+       L150 140 
+       Q100 120, 50 140 Z" 
+    fill="white" 
+    stroke="white" 
+    stroke-width="4"
+  />
+  
+  <!-- Page fold/shadow effect -->
+  <path 
+    d="M100 60 
+       L100 140" 
+    stroke="rgba(255,255,255,0.3)" 
+    stroke-width="4" 
+    stroke-dasharray="5,5"
+  />
+  
+  <!-- Subtle text overlay -->
+  <text 
+    x="100" 
+    y="180" 
+    text-anchor="middle" 
+    font-family="Arial, sans-serif" 
+    font-size="20" 
+    font-weight="bold" 
+    fill="white"
+  >
+    BLOG
+  </text>
+</svg>
