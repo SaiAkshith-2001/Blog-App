@@ -203,6 +203,12 @@ const BlogWrite = () => {
           message: "Please fill all fields!",
           severity: "error",
         });
+      } else if (error.response && error.response.status === 429) {
+        setSnackbar({
+          open: true,
+          message: "Too many requests, please try again later.",
+          severity: "error",
+        });
       } else {
         setSnackbar({
           open: true,
