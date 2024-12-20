@@ -2,7 +2,7 @@ import React from "react";
 import { Container, Box, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import KeyboardArrowRightRoundedIcon from "@mui/icons-material/KeyboardArrowRightRounded";
 const Home = () => {
   const navigate = useNavigate();
   const redirectToRead = () => {
@@ -72,7 +72,7 @@ const Home = () => {
             onClick={redirectToRead}
             sx={{ textTransform: "none", width: { xs: "100%", sm: "auto" } }}
           >
-            Get Started <ArrowForwardIcon />
+            Get Started <KeyboardArrowRightRoundedIcon />
           </Button>
           <Button
             variant="outlined"

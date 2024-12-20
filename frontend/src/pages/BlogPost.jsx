@@ -10,8 +10,8 @@ import {
   CircularProgress,
   Box,
 } from "@mui/material";
+import axios from "axios";
 import { useParams } from "react-router-dom";
-
 const BlogPostStyled = styled(Card)(({ theme }) => ({
   width: "100%",
   marginBottom: theme.spacing(4),
@@ -29,17 +29,13 @@ const BlogPost = () => {
   const getPostDetails = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts/${id}`
+      const response = await axios.get(
+        `http://localhost:5000/api/read/post/${id}`
       );
-      const data = await response.json();
-      // console.log(data);
-      if (!response.ok) {
-        throw new Error("please try again!");
-      } else {
-        setIsLoading(false);
-        setPostDetails(data);
-      }
+      const data = response.data.post;
+      console.log(data);
+      setIsLoading(false);
+      setPostDetails(data);
     } catch (err) {
       console.error("Error in fetching data, Please try again later!", err);
     }
@@ -60,7 +56,6 @@ const BlogPost = () => {
   //       }
   //     }
   //   }, [isLoading]);
-  //
   //   useEffect(() => {
   //     window.addEventListener("scroll", handleScroll);
   //     return () => window.removeEventListener("scroll", handleScroll);
@@ -82,6 +77,18 @@ const BlogPost = () => {
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   {postDetails.body}
+                </Typography>
+                <Typography
+                  color="textSecondary"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    fontStyle: "italic",
+                    p: 0.75,
+                  }}
+                  gutterBottom
+                >
+                  By {postDetails.author}
                 </Typography>
               </CardContent>
             </BlogPostStyled>

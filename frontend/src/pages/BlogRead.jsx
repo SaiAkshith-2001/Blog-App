@@ -14,11 +14,13 @@ import {
   IconButton,
   CardMedia,
   Tooltip,
+  Avatar,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import CommentRoundedIcon from "@mui/icons-material/CommentRounded";
 import { Link } from "react-router-dom";
+import axios from "axios";
 const StyledFab = styled(Fab)(({ theme }) => ({
   position: "fixed",
   bottom: theme.spacing(2),
@@ -37,29 +39,48 @@ const StyledCard = styled(Card)(({ theme }) => ({
 const StyledCardContent = styled(CardContent)({
   flexGrow: 1,
 });
+function stringToColor(string) {
+  let hash = 0;
+  let i;
+  /* eslint-disable no-bitwise */
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let color = "#";
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+  /* eslint-enable no-bitwise */
+  return color;
+}
+
+function stringAvatar(name) {
+  return {
+    sx: {
+      mr: 1,
+      bgcolor: stringToColor(name),
+    },
+    children: `${name.split(" ")[0][0]}${name?.split(" ")[1]?.[0] || ""}`,
+  };
+}
 const BlogRead = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [newsData, setNewsData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-
   const getNews = async () => {
     if (!hasMore) return;
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=10`
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error("please try again!");
-      } else {
-        setIsLoading(false);
-        setNewsData((prevData) => [...prevData, ...data]);
-        if (data.length < 10) {
-          setHasMore(false);
-        }
+      const response = await axios.get("http://localhost:5000/api/read");
+      const data = response.data.posts;
+      console.log(data);
+      setIsLoading(false);
+      setNewsData((prevData) => [...prevData, ...data]);
+      if (data.length < 10) {
+        setHasMore(false);
       }
     } catch (err) {
       setIsLoading(false);
@@ -68,8 +89,8 @@ const BlogRead = () => {
   };
   useEffect(() => {
     getNews();
-  }, [page]);
-
+  }, []);
+  // }, [page]);
   const handleScroll = () => {
     // console.log(window.innerHeight);
     // console.log(document.documentElement.scrollTop);
@@ -129,13 +150,28 @@ const BlogRead = () => {
                     <Typography variant="body2" color="textSecondary">
                       {item.body}
                     </Typography>
+                    <Box
+                      sx={{
+                        pt: 2,
+                        display: "flex",
+                      }}
+                    >
+                      <Avatar {...stringAvatar(item.author)} />
+                      <Typography
+                        color="textSecondary"
+                        sx={{ fontStyle: "italic" }}
+                        gutterBottom
+                      >
+                        By {item.author}
+                      </Typography>
+                    </Box>
                   </StyledCardContent>
                   <CardActions>
                     <Tooltip title="comment" arrow>
                       <IconButton
                         aria-label="comments"
                         component={Link}
-                        to={`/posts/${item.id}`}
+                        to={`/posts/${item._id}`}
                       >
                         <CommentRoundedIcon />
                       </IconButton>
