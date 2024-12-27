@@ -3,43 +3,21 @@ import {
   Typography,
   Container,
   Grid,
-  Card,
-  CardContent,
-  CardActions,
   Button,
   TextField,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton,
   CircularProgress,
   Box,
   Paper,
-  CardMedia,
-  Avatar,
-  Tooltip,
 } from "@mui/material";
-import { styled } from "@mui/system";
-import "react-quill/dist/quill.snow.css";
 import { SnackbarContext } from "../context/SnackbarContext";
 import axios from "axios";
+import BlogCard from "./BlogCard";
+import "react-quill/dist/quill.snow.css";
 const ReactQuill = lazy(() => import("react-quill"));
-const DeleteIcon = lazy(() => import("@mui/icons-material/Delete"));
-const EditIcon = lazy(() => import("@mui/icons-material/Edit"));
-
-const StyledCard = styled(Card)(() => ({
-  height: "100%",
-  display: "flex",
-  flexDirection: "column",
-  transition: "transform 0.15s ease-in-out",
-  "&:hover": {
-    transform: "scale(1.03)",
-  },
-}));
-const StyledCardContent = styled(CardContent)({
-  flexGrow: 1,
-});
 const modules = {
   toolbar: [
     ["bold", "italic", "underline", "strike"],
@@ -58,78 +36,6 @@ const modules = {
     ["clean"], // remove formatting button
   ],
 };
-function stringToColor(string) {
-  let hash = 0;
-  let i;
-  /* eslint-disable no-bitwise */
-  for (i = 0; i < string.length; i += 1) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  let color = "#";
-  for (i = 0; i < 3; i += 1) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-  /* eslint-enable no-bitwise */
-  return color;
-}
-
-function stringAvatar(name) {
-  return {
-    sx: {
-      mr: 1,
-      bgcolor: stringToColor(name),
-    },
-    children: `${name.split(" ")[0][0]}${name?.split(" ")[1]?.[0] || ""}`,
-  };
-}
-const BlogPost = ({ post, onEdit, onDelete }) => (
-  <StyledCard>
-    <CardMedia
-      component="img"
-      height="200"
-      image={`https://images.unsplash.com/photo-1516414447565-b14be0adf13e`}
-      alt={post.title}
-    />
-    <StyledCardContent>
-      <Typography gutterBottom variant="h5" component="div">
-        {post.title}
-      </Typography>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Avatar {...stringAvatar(post.author)} />
-        <Typography
-          color="textSecondary"
-          sx={{ fontStyle: "italic" }}
-          gutterBottom
-        >
-          By {post.author}
-        </Typography>
-      </Box>
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        {post.body.replace(/<\/?[^>]+(>|$)/g, "")}
-      </Typography>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ mt: 1, display: "block" }}
-      >
-        {/* {post.createdAt} */}
-      </Typography>
-    </StyledCardContent>
-    <CardActions>
-      <Tooltip title="Edit" arrow>
-        <IconButton aria-label="edit" onClick={() => onEdit(post)}>
-          <EditIcon />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Delete" arrow>
-        <IconButton aria-label="delete" onClick={() => onDelete(post.id)}>
-          <DeleteIcon />
-        </IconButton>
-      </Tooltip>
-    </CardActions>
-  </StyledCard>
-);
 const BlogWrite = () => {
   const { setSnackbar } = useContext(SnackbarContext);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -162,8 +68,11 @@ const BlogWrite = () => {
     //   setIsLoading(false);
     //   console.error("Error in fetching data, Please try again later!", err);
     // }
+    const token = JSON.parse(localStorage.getItem("tokens"));
     try {
-      const response = await axios.get("http://localhost:5000/api/write");
+      const response = await axios.get("http://localhost:5000/api/write", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = response.data.posts;
       setIsLoading(false);
       setPosts([...data]);
@@ -176,12 +85,21 @@ const BlogWrite = () => {
     fetchPosts();
   }, []);
   const handleCreatePost = async () => {
+    const token = JSON.parse(localStorage.getItem("tokens"));
     try {
-      const response = await axios.post("http://localhost:5000/api/write", {
-        title: newPost.title,
-        author: newPost.author,
-        body: newPost.body.replace(/<\/?[^>]+(>|$)/g, ""),
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/write",
+        {
+          title: newPost.title,
+          author: newPost.author,
+          body: newPost.body.replace(/<\/?[^>]+(>|$)/g, ""),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       // console.log(response.data);
       const post = { ...newPost, id: Date.now() };
       setPosts((prev) => [post, ...prev]);
@@ -217,30 +135,6 @@ const BlogWrite = () => {
         });
       }
     }
-    // if (
-    //   newPost.title.trim() === "" ||
-    //   !newPost.body ||
-    //   newPost.author.trim() === ""
-    // ) {
-    //   setError(true);
-    //   setHelperText("this is required field");
-    //   setSnackbar({
-    //     open: true,
-    //     message: "Please fill all fields",
-    //     severity: "error",
-    //   });
-    //   return;
-    // }
-    // const post = { ...newPost, id: Date.now() };
-    // setPosts((prev) => [post, ...prev]);
-    // setNewPost({ title: "", body: "", author: "" });
-    // setSnackbar({
-    //   open: true,
-    //   message: "Post created successfully",
-    //   severity: "success",
-    // });
-    // setError(false);
-    // setHelperText("");
   };
 
   const handlePostDelete = (id) => {
@@ -341,7 +235,7 @@ const BlogWrite = () => {
             {posts &&
               posts.map((post) => (
                 <Grid item key={post._id} xs={12} sm={6} md={4}>
-                  <BlogPost
+                  <BlogCard
                     post={post}
                     onEdit={handlePostEdit}
                     onDelete={() => setDeleteDialogOpen(true)}

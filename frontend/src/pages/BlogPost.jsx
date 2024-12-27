@@ -1,26 +1,17 @@
 import React, { useState, useEffect } from "react";
 import PostComment from "./PostComment";
-import { styled } from "@mui/system";
 import {
   Container,
-  Grid,
-  Card,
-  CardContent,
   Typography,
   CircularProgress,
   Box,
+  Paper,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-const BlogPostStyled = styled(Card)(({ theme }) => ({
-  width: "100%",
-  marginBottom: theme.spacing(4),
-  transition: "transform 0.3s ease-in-out",
-  "&:hover": {
-    transform: "translateY(-5px)",
-  },
-}));
-
+import ShareIcon from "@mui/icons-material/Share";
 const BlogPost = () => {
   const { id } = useParams();
   const [postDetails, setPostDetails] = useState({});
@@ -28,12 +19,18 @@ const BlogPost = () => {
 
   const getPostDetails = async () => {
     setIsLoading(true);
+    const token = JSON.parse(localStorage.getItem("tokens"));
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/read/post/${id}`
+        `http://localhost:5000/api/read/post/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       const data = response.data.post;
-      console.log(data);
+      // console.log(data);
       setIsLoading(false);
       setPostDetails(data);
     } catch (err) {
@@ -69,31 +66,41 @@ const BlogPost = () => {
         </Box>
       ) : (
         <>
-          <Grid item xs={12} sm={6} md={4}>
-            <BlogPostStyled>
-              <CardContent>
-                <Typography variant="h3" gutterBottom>
-                  {postDetails.title}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {postDetails.body}
-                </Typography>
-                <Typography
-                  color="textSecondary"
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    fontStyle: "italic",
-                    p: 0.75,
-                  }}
-                  gutterBottom
-                >
-                  By {postDetails.author}
-                </Typography>
-              </CardContent>
-            </BlogPostStyled>
-            <PostComment />
-          </Grid>
+          <Paper elevation={2} sx={{ p: 4 }}>
+            <Typography variant="h3" gutterBottom>
+              {postDetails.title}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {postDetails.body}
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+              }}
+            >
+              <Typography
+                color="textSecondary"
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  fontStyle: "italic",
+                  p: 0.75,
+                }}
+                gutterBottom
+              >
+                By {postDetails.author}
+              </Typography>
+              <Tooltip title="Share" arrow>
+                <IconButton>
+                  <ShareIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Paper>
+          <PostComment />
         </>
       )}
     </Container>
