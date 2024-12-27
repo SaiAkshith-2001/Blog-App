@@ -90,33 +90,63 @@ export const login = async (req, res) => {
     });
   }
 };
-export const deleteUser = async (req, res) => {
+export const updateUserById = async (req, res) => {
   try {
-    const username = req.params.username;
-    const removeUser = await User.deleteOne({ username: username });
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        username: req.body.username,
+        email: req.body.email,
+      },
+      {
+        runValidators: true,
+        new: true,
+      }
+    );
     res.json({
-      message: "user deleted successfully",
+      status: "User successfully updated",
+      user: updatedUser,
     });
   } catch (error) {
-    console.error("error occurred:", error);
-    res.status(500).json({
-      message: "Server error during deleting user",
-      error: error.message,
+    res.status(400).json({
+      status: "error",
+      message: error.message,
     });
   }
 };
-export const deleteAllInactiveUser = async (req, res) => {
+
+export const deleteUserById = async (req, res) => {
   try {
-    const removeAllInactiveUser = await User.deleteMany({
-      isActive: { $eq: false },
+    const result = await User.findByIdAndDelete(req.params.id, {
+      runValidators: true,
+      new: true,
     });
     res.json({
-      message: "Inactive Users deleted successfully",
+      message: "User deleted successfully",
     });
   } catch (error) {
-    console.error("error occurred:", error);
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+export const getUserProfileById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select(
+      "-password -refreshToken"
+    );
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    res.json({ data: user });
+  } catch (error) {
+    console.error("Profile fetch error:", error);
     res.status(500).json({
-      message: "Server error during deleting user",
+      message: "Server error fetching profile",
       error: error.message,
     });
   }
@@ -178,26 +208,6 @@ export const deleteAllInactiveUser = async (req, res) => {
 //     console.error("Logout error:", error);
 //     res.status(500).json({
 //       message: "Server error during logout",
-//       error: error.message,
-//     });
-//   }
-// };
-// const getUserProfile = async (req, res) => {
-//   try {
-//     // Fetch user details excluding password
-//     const user = await User.findById(req.user.id).select(
-//       "-password -refreshToken"
-//     );
-//     if (!user) {
-//       return res.status(404).json({
-//         message: "User not found",
-//       });
-//     }
-//     res.json(user);
-//   } catch (error) {
-//     console.error("Profile fetch error:", error);
-//     res.status(500).json({
-//       message: "Server error fetching profile",
 //       error: error.message,
 //     });
 //   }

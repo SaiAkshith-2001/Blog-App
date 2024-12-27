@@ -1,14 +1,14 @@
 import express from "express";
 import { body } from "express-validator";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
-import { login, register, deleteUser } from "../controllers/userController.js";
+import {
+  login,
+  register,
+  updateUserById,
+  deleteUserById,
+  getUserProfileById,
+} from "../controllers/userController.js";
 const router = express.Router();
-// // GET all userss
-// router.get("/", authMiddleware, getAllUsers);
-
-// // GET user by ID
-// router.get("/:id", authMiddleware, getUserById);
-
 router.post(
   "/register",
   [
@@ -32,11 +32,10 @@ router.post(
   ],
   login
 );
-
-// // UPDATE user
-// router.put("/:id", authMiddleware, updateUser);
-
-// // DELETE user
-router.delete("/:username", deleteUser);
+router
+  .route("/:id")
+  .get(getUserProfileById)
+  .patch(authMiddleware, updateUserById)
+  .delete(authMiddleware, deleteUserById);
 
 export default router;
