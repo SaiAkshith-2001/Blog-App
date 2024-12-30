@@ -95,13 +95,38 @@ const Login = () => {
     navigate("/register");
   };
   return (
-    <Container component="main" maxWidth="xs">
+    <Container
+      sx={{
+        py: { xs: 5, md: 10 },
+        display: "flex",
+        flexDirection: { xs: "column", lg: "row" },
+        alignItems: "center",
+        height: "100%",
+      }}
+    >
+      <Box
+        sx={{
+          width: { xs: "100%", lg: "50%" },
+          mt: { xs: 4, lg: 0 },
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <img
+          src="https://www.creative-tim.com/twcomponents/svg/secure-login-animate.svg"
+          alt="Cover Page"
+          style={{
+            width: "100%",
+            height: "auto",
+            maxWidth: "400px",
+          }}
+        />
+      </Box>
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          mt: "8rem",
         }}
       >
         <Typography variant="h4" component="h1">
@@ -111,6 +136,7 @@ const Login = () => {
           <TextField
             label="Username"
             name="username"
+            required
             variant="outlined"
             fullWidth
             margin="normal"
@@ -122,6 +148,7 @@ const Login = () => {
           <TextField
             label="Password"
             name="password"
+            required
             type={showPassword ? "text" : "password"}
             variant="outlined"
             fullWidth

@@ -121,6 +121,7 @@ const Register = () => {
           <TextField
             label="Username"
             name="username"
+            required
             variant="outlined"
             fullWidth
             margin="normal"
@@ -132,6 +133,7 @@ const Register = () => {
           <TextField
             label="Email"
             name="email"
+            required
             variant="outlined"
             fullWidth
             margin="normal"
@@ -140,11 +142,12 @@ const Register = () => {
             helperText={errors.email?.message}
           />
           <TextField
+            label="Password"
             name="password"
+            required
             variant="outlined"
             margin="normal"
             fullWidth
-            label="Password"
             type={showPassword ? "text" : "password"}
             {...register("password")}
             error={Boolean(errors.password)}
@@ -160,11 +163,12 @@ const Register = () => {
             }}
           />
           <TextField
+            label="Confirm Password"
             name="confirmPassword"
+            required
             variant="outlined"
             margin="normal"
             fullWidth
-            label="Confirm Password"
             type={showPassword ? "text" : "password"}
             {...register("confirmPassword")}
             error={Boolean(errors.confirmPassword)}
