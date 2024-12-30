@@ -1,6 +1,5 @@
 import React, { useState, useEffect, lazy, useContext } from "react";
 import {
-  Typography,
   Container,
   Grid,
   Button,
@@ -38,7 +37,7 @@ const modules = {
 };
 const BlogWrite = () => {
   const { setSnackbar } = useContext(SnackbarContext);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  // const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -47,8 +46,8 @@ const BlogWrite = () => {
   const [helperText, setHelperText] = useState("");
   const [newPost, setNewPost] = useState({
     title: "",
-    author: "",
-    body: "",
+    author: { name: "", email: "" },
+    body: { content: "" },
   });
   const fetchPosts = async () => {
     setIsLoading(true);
@@ -70,10 +69,14 @@ const BlogWrite = () => {
     // }
     const token = JSON.parse(localStorage.getItem("tokens"));
     try {
-      const response = await axios.get("http://localhost:5000/api/write", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        "http://localhost:5000/api/posts/write",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const data = response.data.posts;
+      console.log(data);
       setIsLoading(false);
       setPosts([...data]);
     } catch (error) {
@@ -88,11 +91,11 @@ const BlogWrite = () => {
     const token = JSON.parse(localStorage.getItem("tokens"));
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/write",
+        "http://localhost:5000/api/posts/write",
         {
           title: newPost.title,
-          author: newPost.author,
-          body: newPost.body.replace(/<\/?[^>]+(>|$)/g, ""),
+          author: newPost.author.name,
+          body: newPost.body.content.replace(/<\/?[^>]+(>|$)/g, ""),
         },
         {
           headers: {
@@ -100,7 +103,7 @@ const BlogWrite = () => {
           },
         }
       );
-      // console.log(response.data);
+      console.log(response.data);
       const post = { ...newPost, id: Date.now() };
       setPosts((prev) => [post, ...prev]);
       setSnackbar({
@@ -108,7 +111,11 @@ const BlogWrite = () => {
         message: "Post created successfully!",
         severity: "success",
       });
-      setNewPost({ title: "", body: "", author: "" });
+      setNewPost({
+        title: "",
+        author: { name: "", email: "" },
+        body: { content: "" },
+      });
       setError(false);
       setHelperText("");
     } catch (error) {
@@ -137,15 +144,15 @@ const BlogWrite = () => {
     }
   };
 
-  const handlePostDelete = (id) => {
-    setPosts(posts.filter((post) => post.id !== id));
-    setSnackbar({
-      open: true,
-      message: "Post deleted successfully",
-      severity: "success",
-    });
-    setDeleteDialogOpen(false);
-  };
+  // const handlePostDelete = (id) => {
+  //   setPosts(posts.filter((post) => post.id !== id));
+  //   setSnackbar({
+  //     open: true,
+  //     message: "Post deleted successfully",
+  //     severity: "success",
+  //   });
+  //   setDeleteDialogOpen(false);
+  // };
   const handlePostEdit = (post) => {
     setEditingPost(post);
     setDialogOpen(true);
@@ -200,19 +207,30 @@ const BlogWrite = () => {
           <TextField
             fullWidth
             required
-            label="Author"
-            name="author"
-            value={newPost.author}
+            label="Author Name"
+            name="name"
+            value={newPost.author.name}
             onChange={handleInputChange}
             margin="normal"
-            error={newPost.author.trim() === "" ? error : null}
-            helperText={newPost.author.trim() === "" ? helperText : null}
+            error={newPost.author.name.trim() === "" ? error : null}
+            helperText={newPost.author.name.trim() === "" ? helperText : null}
+          />
+          <TextField
+            fullWidth
+            required
+            label="Author Email"
+            name="email"
+            value={newPost.author.email}
+            onChange={handleInputChange}
+            margin="normal"
+            error={newPost.author.email.trim() === "" ? error : null}
+            helperText={newPost.author.email.trim() === "" ? helperText : null}
           />
           <ReactQuill
             theme="snow"
             modules={modules}
             required
-            value={newPost.body}
+            value={newPost.body.content}
             onChange={handleContentChange}
             placeholder="Write your post content here..."
           />
@@ -238,14 +256,14 @@ const BlogWrite = () => {
                   <BlogCard
                     post={post}
                     onEdit={handlePostEdit}
-                    onDelete={() => setDeleteDialogOpen(true)}
+                    // onDelete={() => setDeleteDialogOpen(true)}
                   />
                 </Grid>
               ))}
           </Grid>
         )}
       </Container>
-      <Dialog
+      {/* <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
@@ -265,7 +283,7 @@ const BlogWrite = () => {
             Delete
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Edit Post</DialogTitle>
         <DialogContent>
@@ -284,20 +302,20 @@ const BlogWrite = () => {
           />
           <TextField
             label="Author"
-            value={editingPost?.author}
+            value={editingPost?.author.name}
             onChange={(e) =>
               setEditingPost((prev) => ({ ...prev, author: e.target.value }))
             }
             fullWidth
             margin="normal"
             required
-            error={editingPost?.author === "" ? error : null}
-            helperText={editingPost?.author === "" ? helperText : null}
+            error={editingPost?.author.name === "" ? error : null}
+            helperText={editingPost?.author.name === "" ? helperText : null}
           />
           <ReactQuill
             theme="snow"
             required
-            value={editingPost?.body || ""}
+            value={editingPost?.body.content || ""}
             onChange={(body) => setEditingPost((prev) => ({ ...prev, body }))}
           />
         </DialogContent>

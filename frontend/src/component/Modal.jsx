@@ -22,7 +22,8 @@ function Modal({ post, onEdit, onDelete }) {
         <DialogTitle>{post.title}</DialogTitle>
       </Box>
       <Box>
-        <DialogContent>{post.author}</DialogContent>
+        <DialogContent>{post.author.name}</DialogContent>
+        <DialogContent>{post.author.email}</DialogContent>
       </Box>
       <Box>
         <DialogContent>{post.body}</DialogContent>

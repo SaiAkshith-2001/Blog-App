@@ -3,22 +3,15 @@ import { styled } from "@mui/system";
 import {
   Container,
   Grid,
-  Card,
-  CardContent,
-  Typography,
   TextField,
   Fab,
   CircularProgress,
-  CardActions,
   Box,
   IconButton,
-  CardMedia,
   Tooltip,
-  Avatar,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
-import CommentRoundedIcon from "@mui/icons-material/CommentRounded";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import BlogCard from "./BlogCard";
@@ -38,9 +31,9 @@ const BlogRead = () => {
     if (!hasMore) return;
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/read");
+      const response = await axios.get("http://localhost:5000/api/posts/read");
       const data = response.data.posts;
-      console.log(data);
+      // console.log(data);
       setIsLoading(false);
       setNewsData((prevData) => [...prevData, ...data]);
       if (data.length < 10) {
@@ -86,13 +79,14 @@ const BlogRead = () => {
   return (
     <Container sx={{ marginTop: "6rem" }}>
       <TextField
+        label="Search blogs..."
         variant="outlined"
-        size="small"
-        placeholder="Search blogs..."
+        fullWidth
+        margin="normal"
+        autoFocus
         InputProps={{
           startAdornment: <SearchIcon />,
         }}
-        sx={{ display: "flex", alignItems: "center" }}
         onChange={handleSearch}
       />
       <Container maxWidth="md" style={{ marginTop: "2rem" }}>

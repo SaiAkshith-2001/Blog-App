@@ -14,7 +14,7 @@ const ThemeToggleButton = () => {
         sx={{
           transition: "transform 0.5s ease-in-out",
           transform: rotate ? "rotate(180deg)" : "rotate(0deg)",
-          margin: "auto",
+          // margin: "auto",
         }}
       >
         {darkMode ? <LightModeIcon /> : <DarkModeIcon />}

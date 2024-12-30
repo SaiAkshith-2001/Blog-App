@@ -24,7 +24,7 @@ import { AuthContext } from "./context/AuthContext";
 import ProtectedRoute from "./component/ProtectedRoute";
 import AskAI from "./pages/AskAI";
 const MarkdownContent = lazy(() => import("./component/MarkdownContent"));
-const PostComment = lazy(() => import("./pages/PostComment"));
+const BlogComment = lazy(() => import("./pages/BlogComment"));
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -66,7 +66,7 @@ function App(props) {
             component={Link}
             to="/read"
           >
-            <ListItemText>Feed</ListItemText>
+            <ListItemText>Posts</ListItemText>
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
@@ -186,7 +186,7 @@ function App(props) {
                 to="/read"
                 onClick={() => setProgress(100)}
               >
-                Feed
+                Posts
               </Button>
               {/* <Button
                 color="inherit"
@@ -296,7 +296,7 @@ function App(props) {
             <Route path="/editor" element={<NoteEditor />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/posts/:id/" element={<BlogPost />} />
-            <Route path="/posts/:id/comments" element={<PostComment />} />
+            <Route path="/posts/:id/comments" element={<BlogComment />} />
             <Route path="/md" element={<MarkdownContent />} />
             <Route path="/askai" element={<AskAI />} />
           </Route>

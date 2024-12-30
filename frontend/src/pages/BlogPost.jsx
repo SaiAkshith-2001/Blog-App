@@ -1,28 +1,33 @@
-import React, { useState, useEffect } from "react";
-import PostComment from "./PostComment";
+import React, { useState, useEffect, lazy } from "react";
+import BlogComment from "./BlogComment";
 import {
   Container,
   Typography,
   CircularProgress,
   Box,
+  Stack,
   Paper,
   Tooltip,
   IconButton,
 } from "@mui/material";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import ShareIcon from "@mui/icons-material/Share";
+const ShareIcon = lazy(() => import("@mui/icons-material/Share"));
+const FavoriteIcon = lazy(() => import("@mui/icons-material/Favorite"));
+const CommentIcon = lazy(() => import("@mui/icons-material/Comment"));
+
 const BlogPost = () => {
   const { id } = useParams();
   const [postDetails, setPostDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
   const getPostDetails = async () => {
     setIsLoading(true);
     const token = JSON.parse(localStorage.getItem("tokens"));
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/read/post/${id}`,
+        `http://localhost:5000/api/posts/read/post/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -30,7 +35,6 @@ const BlogPost = () => {
         }
       );
       const data = response.data.post;
-      // console.log(data);
       setIsLoading(false);
       setPostDetails(data);
     } catch (err) {
@@ -71,36 +75,58 @@ const BlogPost = () => {
               {postDetails.title}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              {postDetails.body}
+              {postDetails.body?.content}
             </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-              }}
-            >
-              <Typography
-                color="textSecondary"
+            <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                }}
+              >
+                <Tooltip title={isLiked ? "Unlike" : "Like"} arrow>
+                  <IconButton onClick={() => setIsLiked(!isLiked)}>
+                    <FavoriteIcon sx={{ color: isLiked ? "red" : "null" }} />
+                  </IconButton>
+                  {/* {post.body.interactions.likes} */}
+                </Tooltip>
+                <Tooltip title="Comment" arrow>
+                  <IconButton>
+                    <CommentIcon />
+                  </IconButton>
+                  {/* {post.body.interactions.comments} */}
+                </Tooltip>
+              </Box>
+              <Box
                 sx={{
                   display: "flex",
                   justifyContent: "flex-end",
                   alignItems: "center",
-                  fontStyle: "italic",
-                  p: 0.75,
                 }}
-                gutterBottom
               >
-                By {postDetails.author}
-              </Typography>
-              <Tooltip title="Share" arrow>
-                <IconButton>
-                  <ShareIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
+                <Typography
+                  color="textSecondary"
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    fontStyle: "italic",
+                    p: 0.75,
+                  }}
+                  gutterBottom
+                >
+                  By {postDetails.author?.name}
+                </Typography>
+                <Tooltip title="Share" arrow>
+                  <IconButton>
+                    <ShareIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Stack>
           </Paper>
-          <PostComment />
+          <BlogComment />
         </>
       )}
     </Container>

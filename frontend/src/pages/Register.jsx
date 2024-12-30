@@ -60,11 +60,14 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/register", {
-        email: data.email,
-        username: data.username,
-        password: data.password,
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/user/register",
+        {
+          email: data.email,
+          username: data.username,
+          password: data.password,
+        }
+      );
       redirectToLogin();
       setSnackbar({
         open: true,
