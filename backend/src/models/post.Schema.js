@@ -8,6 +8,7 @@ const postSchema = new mongoose.Schema(
       avatar: { type: String, default: null },
     },
     body: {
+      category: { type: String },
       content: { type: String, required: true },
       interactions: {
         likes: {
