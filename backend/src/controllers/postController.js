@@ -50,8 +50,8 @@ export const readPostById = async (req, res) => {
 export const readPostByAuthor = async (req, res) => {
   try {
     const author = req.query.author;
-    const post = await Post.findOne({
-      author: { $regex: author, $options: "i" },
+    const post = await Post.find({
+      "author.name": { $regex: author, $options: "i" },
     });
     res.json({
       status: "success",

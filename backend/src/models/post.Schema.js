@@ -25,6 +25,10 @@ const postSchema = new mongoose.Schema(
             content: {
               type: String,
             },
+            createdAt: {
+              type: Date,
+              default: Date.now,
+            },
           },
         ],
         shares: {
@@ -32,11 +36,10 @@ const postSchema = new mongoose.Schema(
           default: 0,
         },
       },
-      tags: [
-        {
-          type: String,
-        },
-      ],
+      tags: {
+        type: [String],
+        default: [],
+      },
     },
   },
   { timestamps: true, collection: "posts" }
