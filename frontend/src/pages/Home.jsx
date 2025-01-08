@@ -14,6 +14,7 @@ const Home = () => {
   return (
     <Container
       sx={{
+        my: "6rem",
         py: { xs: 5, md: 10 },
         display: "flex",
         flexDirection: { xs: "column", lg: "row" },

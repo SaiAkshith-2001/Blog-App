@@ -27,7 +27,7 @@ const MarkdownEditor = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, p: 2 }}>
+    <Box sx={{ my: "6rem", flexGrow: 1, p: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Markdown Editor
       </Typography>

@@ -11,11 +11,20 @@ import {
   CircularProgress,
   Box,
   Paper,
+  FormControl,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormHelperText,
+  Chip,
 } from "@mui/material";
 import { SnackbarContext } from "../context/SnackbarContext";
 import axios from "axios";
 import BlogCard from "./BlogCard";
+import { ImageResize } from "quill-image-resize-module-ts";
 import "react-quill/dist/quill.snow.css";
+import { Quill } from "react-quill";
+Quill.register("modules/imageResize", ImageResize);
 const ReactQuill = lazy(() => import("react-quill"));
 const modules = {
   toolbar: [
@@ -34,11 +43,13 @@ const modules = {
     [{ align: [] }],
     ["clean"], // remove formatting button
   ],
+  imageResize: true,
 };
 const BlogWrite = () => {
   const { setSnackbar } = useContext(SnackbarContext);
-  // const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [chips, setChips] = useState([]);
+  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
@@ -47,7 +58,7 @@ const BlogWrite = () => {
   const [newPost, setNewPost] = useState({
     title: "",
     author: { name: "", email: "" },
-    body: { content: "" },
+    body: { category: "", content: "", tags: [] },
   });
   const fetchPosts = async () => {
     setIsLoading(true);
@@ -76,7 +87,7 @@ const BlogWrite = () => {
         }
       );
       const data = response.data.posts;
-      console.log(data);
+      // console.log(data);
       setIsLoading(false);
       setPosts([...data]);
     } catch (error) {
@@ -94,8 +105,12 @@ const BlogWrite = () => {
         "http://localhost:5000/api/posts/write",
         {
           title: newPost.title,
-          author: newPost.author.name,
-          body: newPost.body.content.replace(/<\/?[^>]+(>|$)/g, ""),
+          author: { name: newPost.author.name, email: newPost.author.email },
+          body: {
+            tags: chips,
+            category: newPost.body.category,
+            content: newPost.body.content.replace(/<\/?[^>]+(>|$)/g, ""),
+          },
         },
         {
           headers: {
@@ -103,7 +118,7 @@ const BlogWrite = () => {
           },
         }
       );
-      console.log(response.data);
+      //console.log(response.data);
       const post = { ...newPost, id: Date.now() };
       setPosts((prev) => [post, ...prev]);
       setSnackbar({
@@ -114,9 +129,11 @@ const BlogWrite = () => {
       setNewPost({
         title: "",
         author: { name: "", email: "" },
-        body: { content: "" },
+        body: { category: "", content: "", tags: [] },
       });
       setError(false);
+      setChips([]);
+      setInputValue("");
       setHelperText("");
     } catch (error) {
       console.error("Something went wrong", error);
@@ -143,7 +160,6 @@ const BlogWrite = () => {
       }
     }
   };
-
   // const handlePostDelete = (id) => {
   //   setPosts(posts.filter((post) => post.id !== id));
   //   setSnackbar({
@@ -157,7 +173,6 @@ const BlogWrite = () => {
     setEditingPost(post);
     setDialogOpen(true);
   };
-
   const handleUpdatePost = () => {
     setPosts((prev) =>
       prev.map((p) => (p.id === editingPost.id ? editingPost : p))
@@ -183,15 +198,70 @@ const BlogWrite = () => {
   };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewPost((prev) => ({ ...prev, [name]: value }));
+    setNewPost((prev) => ({
+      ...prev,
+      [name]: value,
+      author: {
+        ...prev.author,
+        [name]: value,
+      },
+      body: {
+        ...prev.body,
+        [name]: value,
+      },
+    }));
   };
-  const handleContentChange = (body) => {
-    setNewPost((prev) => ({ ...prev, body }));
+  const handleContentChange = (content) => {
+    setNewPost((prev) => ({
+      ...prev,
+      body: {
+        ...prev.body,
+        content: content,
+      },
+    }));
   };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && inputValue.trim()) {
+      event.preventDefault();
+      if (!chips.includes(inputValue.trim())) {
+        setChips((prev) => [...prev, inputValue.trim()]);
+        setInputValue("");
+      }
+    } else if (event.key === "Backspace" && !inputValue && chips.length > 0) {
+      setChips((prev) => prev.slice(0, -1));
+    }
+  };
+
+  const handleDelete = (chipToDelete) => {
+    setChips((prev) => prev.filter((chip) => chip !== chipToDelete));
+  };
+
   return (
     <>
-      <Container sx={{ py: 8, my: 4 }} maxWidth="md">
-        <Paper sx={{ p: 2, mb: 2 }} elevation={3}>
+      <Container
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          my: "6rem",
+          // height: `calc(100vh - 64px)`,
+          // "@media (min-width: 768px)": {
+          //   height: `calc(100vh - 80px)}`,
+          // },
+        }}
+        maxWidth="md"
+      >
+        <Paper
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            flex: 1,
+            p: 2,
+            borderRadius: 4,
+          }}
+          elevation={3}
+        >
           <TextField
             fullWidth
             required
@@ -226,6 +296,75 @@ const BlogWrite = () => {
             error={newPost.author.email.trim() === "" ? error : null}
             helperText={newPost.author.email.trim() === "" ? helperText : null}
           />
+          <Box
+            sx={{
+              py: 2,
+              display: "flex",
+              flex: 1,
+            }}
+          >
+            <FormControl
+              fullWidth
+              error={newPost.body.category.trim() === "" ? error : null}
+            >
+              <InputLabel>Category</InputLabel>
+              <Select
+                name="category"
+                value={newPost.body.category}
+                label="Category"
+                required
+                onChange={handleInputChange}
+              >
+                <MenuItem value="General">General</MenuItem>
+                <MenuItem value="Innovations"> Innovations </MenuItem>
+                <MenuItem value="Current Affairs">Current Affairs</MenuItem>
+                <MenuItem value="AI">AI</MenuItem>
+                <MenuItem value="Web Development">Web Development</MenuItem>
+                <MenuItem value="Marketing">Marketing</MenuItem>
+                <MenuItem value="Trends">Trends</MenuItem>
+              </Select>
+              {/* {newPost.body.category.trim() === "" ? (
+                <FormHelperText>this is a required field</FormHelperText>
+              ) : null} */}
+            </FormControl>
+          </Box>
+          <Box sx={{ pb: 2 }}>
+            <TextField
+              fullWidth
+              required
+              label="Tags"
+              name="tags"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              margin="normal"
+              placeholder={
+                chips?.length === 0 ? "Type and press Enter to add tags" : ""
+              }
+              error={chips?.length === 0 ? error : null}
+              helperText={chips?.length === 0 ? helperText : null}
+              sx={{ borderRadius: 4, pb: 0.75 }}
+            />
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 1,
+                pointerEvents: "none",
+                "& .MuiChip-root": {
+                  pointerEvents: "auto",
+                },
+              }}
+            >
+              {chips?.map((chip, index) => (
+                <Chip
+                  key={index}
+                  label={chip}
+                  onDelete={() => handleDelete(chip)}
+                />
+              ))}
+            </Box>
+          </Box>
           <ReactQuill
             theme="snow"
             modules={modules}
@@ -233,17 +372,21 @@ const BlogWrite = () => {
             value={newPost.body.content}
             onChange={handleContentChange}
             placeholder="Write your post content here..."
+            sx={{
+              flex: 1,
+              borderRadius: 16,
+            }}
           />
-          <Box mt={2}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleCreatePost}
-            >
-              Create Post
-            </Button>
-          </Box>
         </Paper>
+        <Box sx={{ my: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCreatePost}
+          >
+            Create Post
+          </Button>
+        </Box>
         {isLoading ? (
           <Box sx={{ display: "flex", justifyContent: "center" }}>
             <CircularProgress />

@@ -7,36 +7,35 @@ import {
   CardMedia,
   CardHeader,
   Avatar,
-  Tooltip,
   Menu,
   MenuItem,
   Chip,
   Stack,
+  Box,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
-
-const FavoriteIcon = lazy(() => import("@mui/icons-material/Favorite"));
-const CommentIcon = lazy(() => import("@mui/icons-material/Comment"));
+import { format } from "timeago.js";
 const MoreVertIcon = lazy(() => import("@mui/icons-material/MoreVert"));
 const DeleteIcon = lazy(() => import("@mui/icons-material/Delete"));
 const EditIcon = lazy(() => import("@mui/icons-material/Edit"));
 const ShareIcon = lazy(() => import("@mui/icons-material/Share"));
 const FlagIcon = lazy(() => import("@mui/icons-material/Flag"));
 const PushPin = lazy(() => import("@mui/icons-material/PushPin"));
-function convertDate(dateStr) {
+export const convertDate = (dateStr) => {
   const date = new Date(dateStr);
   const options = {
-    month: "long", // Full month name
+    year: "numeric",
+    month: "short", // Full month name
     day: "numeric", // Numeric day
-    hour: "numeric", // Hour
-    minute: "numeric", // Minute
-    hour12: true, // 12-hour format
+    // hour: "numeric", // Hour
+    // minute: "numeric", // Minute
+    // hour12: true, // 12-hour format
   };
-  const formattedDate = date.toLocaleString("en-US", options);
+  const formatter = new Intl.DateTimeFormat("en-US", options);
+  const formattedDate = formatter.format(date);
   return formattedDate;
-}
-
+};
 function stringToColor(string) {
   let hash = 0;
   let i;
@@ -68,6 +67,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   cursor: "pointer",
+  borderRadius: 16,
   transition: "transform 0.2s ease-in-out,box-shadow 0.2s ease-in-out",
   "&:hover": {
     transform: "scale(1.03)",
@@ -81,6 +81,7 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const handleMoreOptions = (event) => {
+    event.stopPropagation();
     setAnchorEl(event.currentTarget);
   };
   const handleMoreOptionsClose = () => {
@@ -89,68 +90,76 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
   const handleCardClick = () => {
     navigate(`/posts/${post?._id}`);
   };
+  const renderContent = (content) => {
+    const wordLimit = 30;
+    const words = content.split(" ");
+    if (content.length > wordLimit) {
+      return words.slice(0, wordLimit).join(" ") + "...";
+    }
+    return content;
+  };
   return (
-    <StyledCard onClick={handleCardClick}>
+    <StyledCard variant="outlined" onClick={handleCardClick}>
       <CardHeader
         avatar={<Avatar {...stringAvatar(post.author?.name)} />}
         action={
           <>
-            <Tooltip arrow title="More">
-              <IconButton color="inherit" onClick={handleMoreOptions}>
-                <MoreVertIcon />
-              </IconButton>
-            </Tooltip>
+            <IconButton color="inherit" onClick={handleMoreOptions}>
+              <MoreVertIcon />
+            </IconButton>
+
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               onClose={handleMoreOptionsClose}
+              onClick={(e) => e.stopPropagation()}
             >
               <MenuItem>
-                <Tooltip title="top" arrow>
-                  <IconButton>
-                    <PushPin />
-                  </IconButton>
-                </Tooltip>{" "}
+                <IconButton>
+                  <PushPin />
+                </IconButton>
                 Pin
               </MenuItem>
               <MenuItem>
-                <Tooltip title="Edit" arrow>
-                  <IconButton onClick={() => onEdit(post)}>
-                    <EditIcon />
-                  </IconButton>
-                </Tooltip>{" "}
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(post);
+                  }}
+                >
+                  <EditIcon />
+                </IconButton>
                 Edit
               </MenuItem>
               <MenuItem>
-                <Tooltip title="Delete" arrow>
-                  <IconButton onClick={() => onDelete(post._id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>{" "}
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(post._id);
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
                 Delete
               </MenuItem>
               <MenuItem>
-                <Tooltip title="Share" arrow>
-                  <IconButton>
-                    <ShareIcon />
-                  </IconButton>
-                </Tooltip>{" "}
+                <IconButton>
+                  <ShareIcon />
+                </IconButton>
                 Share
               </MenuItem>
               <MenuItem>
-                {" "}
-                <Tooltip title="Report" arrow>
-                  <IconButton>
-                    <FlagIcon />
-                  </IconButton>
-                </Tooltip>{" "}
+                <IconButton>
+                  <FlagIcon />
+                </IconButton>
                 Report
               </MenuItem>
             </Menu>
           </>
         }
         title={post.author?.name}
-        subheader={convertDate(post.createdAt)}
+        subheader={format(post?.createdAt)}
+        // subheader={convertDate(post?.createdAt)}
       />
       <CardMedia
         component="img"
@@ -159,31 +168,34 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
         alt={post.title}
       />
       <StyledCardContent>
-        <Typography gutterBottom variant="h5" component="div">
+        <Typography
+          gutterBottom
+          variant="h5"
+          component="div"
+          sx={{ fontWeight: "bold" }}
+        >
           {post.title}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {post.body?.content?.replace(/<\/?[^>]+(>|$)/g, "")}
+          {renderContent(post.body?.content?.replace(/<\/?[^>]+(>|$)/g, ""))}
         </Typography>
-        <Stack direction="row" spacing={1}>
-          {post.body?.tags &&
-            post.body?.tags.map((tag) => <Chip label={tag} />)}
+        <Stack
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            maxWidth: "100%",
+            flexDirection: { xs: "column", md: "row" },
+            py: 2,
+            gap: 0.75,
+          }}
+        >
+          {post?.body?.tags &&
+            post?.body?.tags.map((tag) => (
+              <Chip label={tag} key={tag} sx={{ textOverflow: "ellipsis" }} />
+            ))}
         </Stack>
       </StyledCardContent>
-      {/* <CardActions sx={{ display: "flex", justifyContent: "flex-start" }}>
-        <Tooltip title={isLiked ? "Unlike" : "Like"} arrow>
-          <IconButton onClick={() => setIsLiked(!isLiked)}>
-            <FavoriteIcon sx={{ color: isLiked ? "red" : "null" }} />
-          </IconButton>
-          {/* {post.body.interactions.likes} 
-        </Tooltip>
-        <Tooltip title="Comment" arrow>
-          <IconButton>
-            <CommentIcon />
-          </IconButton>
-          {/* {post.body.interactions.comments}
-        </Tooltip>
-      </CardActions> */}
     </StyledCard>
   );
 };

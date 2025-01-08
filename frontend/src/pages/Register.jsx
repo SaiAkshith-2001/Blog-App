@@ -7,6 +7,10 @@ import {
   Typography,
   IconButton,
   Tooltip,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  Radio,
 } from "@mui/material";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -41,7 +45,13 @@ const registrationValidationSchema = Yup.object({
 const Register = () => {
   const { setSnackbar } = useContext(SnackbarContext);
   const [showPassword, setShowPassword] = useState(false);
+  const [selectedRole, setSelectedRole] = useState("");
   const navigate = useNavigate();
+
+  const handleRoleChange = (event) => {
+    setSelectedRole(event.target.value);
+  };
+  const roles = ["Guest", "User", "Admin"];
   const {
     register,
     handleSubmit,
@@ -66,6 +76,7 @@ const Register = () => {
           email: data.email,
           username: data.username,
           password: data.password,
+          role: selectedRole,
         }
       );
       redirectToLogin();
@@ -103,9 +114,8 @@ const Register = () => {
       }
     }
   };
-
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="xs" sx={{ my: "6rem" }}>
       <Box
         sx={{
           display: "flex",
@@ -174,6 +184,25 @@ const Register = () => {
             error={Boolean(errors.confirmPassword)}
             helperText={errors.confirmPassword?.message}
           />
+          <Box sx={{ p: 2 }}>
+            <FormControl>
+              <RadioGroup
+                row
+                name="role"
+                value={selectedRole}
+                onChange={handleRoleChange}
+              >
+                {roles.map((role) => (
+                  <FormControlLabel
+                    key={role}
+                    value={role}
+                    control={<Radio />}
+                    label={<Typography>{role}</Typography>}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
+          </Box>
           <Button
             type="submit"
             fullWidth
