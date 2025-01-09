@@ -15,6 +15,7 @@ import {
 import axios from "axios";
 import { convertDate } from "./BlogCard";
 import { useParams } from "react-router-dom";
+import DOMPurify from "dompurify";
 const ShareIcon = lazy(() => import("@mui/icons-material/Share"));
 const FavoriteIcon = lazy(() => import("@mui/icons-material/Favorite"));
 const SendRoundedIcon = lazy(() => import("@mui/icons-material/SendRounded"));
@@ -64,7 +65,37 @@ const BlogPost = () => {
   //     window.addEventListener("scroll", handleScroll);
   //     return () => window.removeEventListener("scroll", handleScroll);
   //   }, [isLoading]);
-
+  const sanitizedContent = DOMPurify.sanitize(postDetails?.body?.content, {
+    USE_PROFILES: { html: true },
+    //   ALLOWED_TAGS: [
+    //     "b",
+    //     "p",
+    //     "u",
+    //     "i",
+    //     "em",
+    //     "strong",
+    //     "a",
+    //     "img",
+    //     "span",
+    //     "h1",
+    //     "h2",
+    //     "h3",
+    //     "h4",
+    //     "h5",
+    //     "h6",
+    //     "tabel",
+    //     "tr",
+    //     "td",
+    //     "th",
+    //     "ul",
+    //     "ol",
+    //     "li",
+    //     "br",
+    //     "pre",
+    //     "blockquote",
+    //   ], // Allow only these tags
+    //   ALLOWED_ATTR: ["href", "class", "src", "spellcheck"], // Allow only `href` attributes
+  });
   return (
     <Container maxWidth="md" style={{ marginTop: "6rem" }}>
       {isLoading ? (
@@ -78,7 +109,7 @@ const BlogPost = () => {
             sx={{ fontWeight: "bold", lineHeight: 1.6 }}
             gutterBottom
           >
-            {postDetails.title}
+            {postDetails?.title}
           </Typography>
           <Typography
             sx={{
@@ -131,7 +162,7 @@ const BlogPost = () => {
                 }}
                 gutterBottom
               >
-                By {postDetails.author?.name}
+                By {postDetails?.author?.name}
               </Typography>
               <Tooltip title="Share" arrow>
                 <IconButton>
@@ -148,9 +179,10 @@ const BlogPost = () => {
               lineHeight: 1.6,
               py: 0.75,
             }}
-          >
-            {postDetails.body?.content}
-          </Typography>
+            dangerouslySetInnerHTML={{
+              __html: sanitizedContent,
+            }}
+          />
           <Stack
             sx={{
               display: "flex",
@@ -161,8 +193,8 @@ const BlogPost = () => {
               gap: 0.75,
             }}
           >
-            {postDetails.body?.tags &&
-              postDetails.body?.tags.map((tag) => (
+            {postDetails?.body?.tags &&
+              postDetails?.body?.tags.map((tag) => (
                 <Chip label={tag} key={tag} />
               ))}
           </Stack>
@@ -188,16 +220,16 @@ const BlogPost = () => {
             }}
           />
           <Box sx={{ p: 2 }}>
-            {postDetails.body?.interactions?.comments?.map((i) => (
+            {postDetails?.body?.interactions?.comments?.map((i) => (
               <>
                 <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                  <Avatar>{i.username.split(" ")[0][0]}</Avatar>
+                  <Avatar>{i?.username?.split(" ")[0][0]}</Avatar>
                   <Typography sx={{ fontWeight: "bold" }}>
-                    {i.username}
+                    {i?.username}
                   </Typography>
-                  <Typography key={i.id}>{i.content}</Typography>
+                  <Typography key={i.id}>{i?.content}</Typography>
                   <Typography variant="subtitle2">
-                    {convertDate(i.createdAt)}
+                    {convertDate(i?.createdAt)}
                   </Typography>
                 </Box>
               </>

@@ -11,7 +11,6 @@ import {
   MenuItem,
   Chip,
   Stack,
-  Box,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";

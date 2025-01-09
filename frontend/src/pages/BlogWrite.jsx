@@ -23,6 +23,7 @@ import axios from "axios";
 import BlogCard from "./BlogCard";
 import { ImageResize } from "quill-image-resize-module-ts";
 import "react-quill/dist/quill.snow.css";
+import "../index.css";
 import { Quill } from "react-quill";
 Quill.register("modules/imageResize", ImageResize);
 const ReactQuill = lazy(() => import("react-quill"));
@@ -109,7 +110,8 @@ const BlogWrite = () => {
           body: {
             tags: chips,
             category: newPost.body.category,
-            content: newPost.body.content.replace(/<\/?[^>]+(>|$)/g, ""),
+            content: newPost.body.content,
+            // content: newPost.body.content.replace(/<\/?[^>]+(>|$)/g, ""),
           },
         },
         {
@@ -254,9 +256,7 @@ const BlogWrite = () => {
       >
         <Paper
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            flex: 1,
+            width: "100%",
             p: 2,
             borderRadius: 4,
           }}
@@ -323,9 +323,9 @@ const BlogWrite = () => {
                 <MenuItem value="Marketing">Marketing</MenuItem>
                 <MenuItem value="Trends">Trends</MenuItem>
               </Select>
-              {/* {newPost.body.category.trim() === "" ? (
+              {newPost.body.category.trim() === "" && error ? (
                 <FormHelperText>this is a required field</FormHelperText>
-              ) : null} */}
+              ) : null}
             </FormControl>
           </Box>
           <Box sx={{ pb: 2 }}>
@@ -372,10 +372,10 @@ const BlogWrite = () => {
             value={newPost.body.content}
             onChange={handleContentChange}
             placeholder="Write your post content here..."
-            sx={{
-              flex: 1,
-              borderRadius: 16,
+            style={{
+              height: "300px",
             }}
+            className="customEditor"
           />
         </Paper>
         <Box sx={{ my: 2 }}>
