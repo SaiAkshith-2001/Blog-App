@@ -66,12 +66,32 @@ export const readPostByAuthor = async (req, res) => {
 };
 export const updatePostById = async (req, res) => {
   try {
+    const existingPost = await Post.findById(req.params.id);
+    if (!existingPost) {
+      return res.status(404).json({
+        status: "error",
+        message: "Post not found",
+      });
+    }
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.id,
       {
-        title: req.body.title,
-        body: req.body.body,
-        author: req.body.author,
+        $set: {
+          title: req.body.title,
+          "author.email": req.body.author.email,
+          "author.name": req.body.author.name,
+          "author.avatar": req.body.author.avatar,
+          "body.tags": req.body.body.tags,
+          "body.category": req.body.body.category,
+          "body.content": req.body.body.content,
+          "body.interactions.likes": req.body.body.likes,
+          "body.interactions.shares": req.body.body.shares,
+          // comments: {
+          //   count: req.body.count,
+          //   username: req.body.username,
+          //   content: req.body.comments.content,
+          // },
+        },
       },
       {
         runValidators: true,
