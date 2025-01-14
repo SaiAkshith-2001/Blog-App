@@ -84,8 +84,8 @@ export const updatePostById = async (req, res) => {
           "body.tags": req.body.body.tags,
           "body.category": req.body.body.category,
           "body.content": req.body.body.content,
-          "body.interactions.likes": req.body.body.likes,
-          "body.interactions.shares": req.body.body.shares,
+          // "body.interactions.likes": req.body.body.likes,
+          // "body.interactions.shares": req.body.body.shares,
           // comments: {
           //   count: req.body.count,
           //   username: req.body.username,
