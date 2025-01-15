@@ -3,18 +3,19 @@ import { styled } from "@mui/system";
 import {
   Container,
   Grid,
-  TextField,
   Fab,
   CircularProgress,
   Box,
   IconButton,
   Tooltip,
+  TextField,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import BlogCard from "./BlogCard";
+
 const StyledFab = styled(Fab)(({ theme }) => ({
   position: "fixed",
   bottom: theme.spacing(2),
@@ -75,11 +76,10 @@ const BlogRead = () => {
   const filteredPosts = newsData.filter((post) =>
     post.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   return (
     <Container sx={{ marginTop: "6rem" }}>
       <TextField
-        label="Search blogs..."
+        placeholder="Search all topics"
         variant="outlined"
         fullWidth
         margin="normal"

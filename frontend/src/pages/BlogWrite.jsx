@@ -3,20 +3,20 @@ import {
   Container,
   Grid,
   Button,
-  TextField,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   CircularProgress,
   Box,
-  Paper,
   FormControl,
   MenuItem,
   Select,
-  InputLabel,
   FormHelperText,
   Chip,
+  Typography,
+  InputLabel,
+  TextField,
 } from "@mui/material";
 import { SnackbarContext } from "../context/SnackbarContext";
 import axios from "axios";
@@ -53,7 +53,13 @@ const BlogWrite = () => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingPost, setEditingPost] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const [editingPost, setEditingPost] = useState({
+    title: "",
+    author: { name: "", email: "" },
+    body: { category: "", content: "", tags: [] },
+  });
   const [error, setError] = useState(false);
   const [helperText, setHelperText] = useState("");
   const [newPost, setNewPost] = useState({
@@ -61,6 +67,7 @@ const BlogWrite = () => {
     author: { name: "", email: "" },
     body: { category: "", content: "", tags: [] },
   });
+  const [deletePost, setDeletePost] = useState(null);
   const fetchPosts = async () => {
     setIsLoading(true);
     // try {
@@ -94,10 +101,36 @@ const BlogWrite = () => {
     } catch (error) {
       setIsLoading(false);
       console.error("Error in fetching data, Please try again later!", error);
+      setSnackbar({
+        open: true,
+        message: "Something went wrong Please try again later!",
+        severity: "error",
+      });
     }
   };
   useEffect(() => {
     fetchPosts();
+    return () => {
+      // Reset all state
+      setNewPost({
+        title: "",
+        author: { name: "", email: "" },
+        body: { category: "", content: "", tags: [] },
+      });
+      setEditingPost({
+        title: "",
+        author: { name: "", email: "" },
+        body: { category: "", content: "", tags: [] },
+      });
+      setChips([]);
+      setInputValue("");
+      setError(false);
+      setHelperText("");
+
+      // Close any open dialogs
+      setDialogOpen(false);
+      setDeleteDialogOpen(false);
+    };
   }, []);
   const handleCreatePost = async () => {
     const token = JSON.parse(localStorage.getItem("tokens"));
@@ -111,7 +144,6 @@ const BlogWrite = () => {
             tags: chips,
             category: newPost.body.category,
             content: newPost.body.content,
-            // content: newPost.body.content.replace(/<\/?[^>]+(>|$)/g, ""),
           },
         },
         {
@@ -162,26 +194,59 @@ const BlogWrite = () => {
       }
     }
   };
-  // const handlePostDelete = (id) => {
-  //   setPosts(posts.filter((post) => post.id !== id));
-  //   setSnackbar({
-  //     open: true,
-  //     message: "Post deleted successfully",
-  //     severity: "success",
-  //   });
-  //   setDeleteDialogOpen(false);
-  // };
+  const handleDeleteDialog = (post) => {
+    setDeletePost(post);
+    setDeleteDialogOpen(true);
+  };
+  const handlePostDelete = async () => {
+    const token = JSON.parse(localStorage.getItem("tokens"));
+    try {
+      const response = await axios.delete(
+        `http://localhost:5000/api/posts/read/post/${deletePost._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.status === 204) {
+        setPosts(posts.filter((post) => post._id !== deletePost._id));
+        setDeleteDialogOpen(false);
+        setDeletePost(null);
+        setSnackbar({
+          open: true,
+          message: "Post deleted successfully",
+          severity: "success",
+        });
+      }
+    } catch (error) {
+      console.error("Something went wrong", error);
+      setDeleteDialogOpen(false);
+      setSnackbar({
+        open: true,
+        message:
+          error.response?.data?.message ||
+          "Something went wrong Please try again later!",
+        severity: "error",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setDeletePost(null);
+    }
+  };
   const handlePostEdit = (post) => {
     setEditingPost(post);
     setDialogOpen(true);
   };
-  const handleUpdatePost = () => {
-    setPosts((prev) =>
-      prev.map((p) => (p.id === editingPost.id ? editingPost : p))
-    );
-    if (!editingPost?.title || !editingPost?.body || !editingPost?.author) {
+  const handleUpdatePost = async () => {
+    const token = JSON.parse(localStorage.getItem("tokens"));
+    if (
+      !editingPost?.title?.trim() ||
+      !editingPost?.body?.content?.trim() ||
+      !editingPost?.author?.name?.trim()
+    ) {
       setError(true);
-      setHelperText("this is required field");
+      setHelperText("This is required field");
       setSnackbar({
         open: true,
         message: "Please fill all fields",
@@ -189,14 +254,63 @@ const BlogWrite = () => {
       });
       return;
     }
-    setDialogOpen(false);
-    setSnackbar({
-      open: true,
-      message: "Post updated successfully",
-      severity: "success",
-    });
-    setError(false);
-    setHelperText("");
+    try {
+      setIsLoading(true);
+      const response = await axios.put(
+        `http://localhost:5000/api/posts/read/post/${editingPost._id}`,
+        {
+          title: editingPost.title.trim(),
+          author: {
+            name: editingPost.author.name.trim(),
+            email: editingPost.author.email.trim(),
+          },
+          body: {
+            tags: editingPost.body.chips,
+            category: editingPost.body.category.trim(),
+            content: editingPost.body.content.trim(),
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // console.log(response.data);
+      if (response.status === 204) {
+        setPosts((prev) =>
+          prev.map((post) =>
+            post._id === editingPost._id ? editingPost : post
+          )
+        );
+        setDialogOpen(false);
+        setSnackbar({
+          open: true,
+          message: "Post updated successfully",
+          severity: "success",
+        });
+        setError(false);
+        setHelperText("");
+      }
+    } catch (error) {
+      console.error("Error in fetching data, Please try again later!", error);
+      if (error.response && error.response.status === 429) {
+        setSnackbar({
+          open: true,
+          message: "Too many requests, please try again later.",
+          severity: "error",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: "Something went wrong Please try again later!",
+          severity: "error",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+      setDialogOpen(false);
+    }
   };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -222,7 +336,6 @@ const BlogWrite = () => {
       },
     }));
   };
-
   const handleKeyDown = (event) => {
     if (event.key === "Enter" && inputValue.trim()) {
       event.preventDefault();
@@ -234,11 +347,18 @@ const BlogWrite = () => {
       setChips((prev) => prev.slice(0, -1));
     }
   };
-
   const handleDelete = (chipToDelete) => {
     setChips((prev) => prev.filter((chip) => chip !== chipToDelete));
   };
-
+  const categoryOptions = [
+    "General",
+    "Innovations",
+    "Current Affairs",
+    "AI",
+    "Web Development",
+    "Marketing",
+    "Trends",
+  ];
   return (
     <>
       <Container
@@ -247,137 +367,124 @@ const BlogWrite = () => {
           flexDirection: "column",
           flex: 1,
           my: "6rem",
-          // height: `calc(100vh - 64px)`,
-          // "@media (min-width: 768px)": {
-          //   height: `calc(100vh - 80px)}`,
-          // },
         }}
         maxWidth="md"
       >
-        <Paper
+        <TextField
+          fullWidth
+          required
+          autoFocus
+          placeholder="Title"
+          name="title"
+          value={newPost.title}
+          onChange={handleInputChange}
+          margin="normal"
+          error={newPost.title.trim() === "" ? error : null}
+          helperText={newPost.title.trim() === "" ? helperText : null}
+        />
+        <TextField
+          fullWidth
+          required
+          placeholder="Author Name"
+          name="name"
+          value={newPost.author.name}
+          onChange={handleInputChange}
+          margin="normal"
+          error={newPost.author.name.trim() === "" ? error : null}
+          helperText={newPost.author.name.trim() === "" ? helperText : null}
+        />
+        <TextField
+          fullWidth
+          required
+          placeholder="Author Email"
+          name="email"
+          value={newPost.author.email}
+          onChange={handleInputChange}
+          margin="normal"
+          error={newPost.author.email.trim() === "" ? error : null}
+          helperText={newPost.author.email.trim() === "" ? helperText : null}
+        />
+        <Box
           sx={{
-            width: "100%",
-            p: 2,
-            borderRadius: 4,
+            py: 2,
+            display: "flex",
+            flex: 1,
           }}
-          elevation={3}
         >
+          <FormControl
+            fullWidth
+            error={newPost.body.category.trim() === "" ? error : null}
+          >
+            <InputLabel>Category</InputLabel>
+            <Select
+              name="category"
+              label="Category"
+              value={newPost.body.category}
+              required
+              onChange={handleInputChange}
+              sx={{
+                borderRadius: "40px",
+              }}
+            >
+              {categoryOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Select>
+            {newPost.body.category.trim() === "" && error ? (
+              <FormHelperText>this is a required field</FormHelperText>
+            ) : null}
+          </FormControl>
+        </Box>
+        <Box sx={{ pb: 2 }}>
           <TextField
             fullWidth
             required
-            autoFocus
-            label="Title"
-            name="title"
-            value={newPost.title}
-            onChange={handleInputChange}
+            name="tags"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
             margin="normal"
-            error={newPost.title.trim() === "" ? error : null}
-            helperText={newPost.title.trim() === "" ? helperText : null}
-          />
-          <TextField
-            fullWidth
-            required
-            label="Author Name"
-            name="name"
-            value={newPost.author.name}
-            onChange={handleInputChange}
-            margin="normal"
-            error={newPost.author.name.trim() === "" ? error : null}
-            helperText={newPost.author.name.trim() === "" ? helperText : null}
-          />
-          <TextField
-            fullWidth
-            required
-            label="Author Email"
-            name="email"
-            value={newPost.author.email}
-            onChange={handleInputChange}
-            margin="normal"
-            error={newPost.author.email.trim() === "" ? error : null}
-            helperText={newPost.author.email.trim() === "" ? helperText : null}
+            placeholder={
+              chips?.length === 0 ? "Type and press Enter to add tags" : ""
+            }
+            error={chips?.length === 0 ? error : null}
+            helperText={chips?.length === 0 ? helperText : null}
+            sx={{ borderRadius: 4, pb: 0.75 }}
           />
           <Box
             sx={{
-              py: 2,
               display: "flex",
-              flex: 1,
+              flexWrap: "wrap",
+              gap: 1,
+              pointerEvents: "none",
+              "& .MuiChip-root": {
+                pointerEvents: "auto",
+              },
             }}
           >
-            <FormControl
-              fullWidth
-              error={newPost.body.category.trim() === "" ? error : null}
-            >
-              <InputLabel>Category</InputLabel>
-              <Select
-                name="category"
-                value={newPost.body.category}
-                label="Category"
-                required
-                onChange={handleInputChange}
-              >
-                <MenuItem value="General">General</MenuItem>
-                <MenuItem value="Innovations"> Innovations </MenuItem>
-                <MenuItem value="Current Affairs">Current Affairs</MenuItem>
-                <MenuItem value="AI">AI</MenuItem>
-                <MenuItem value="Web Development">Web Development</MenuItem>
-                <MenuItem value="Marketing">Marketing</MenuItem>
-                <MenuItem value="Trends">Trends</MenuItem>
-              </Select>
-              {newPost.body.category.trim() === "" && error ? (
-                <FormHelperText>this is a required field</FormHelperText>
-              ) : null}
-            </FormControl>
+            {chips?.map((chip, index) => (
+              <Chip
+                key={index}
+                label={chip}
+                onDelete={() => handleDelete(chip)}
+              />
+            ))}
           </Box>
-          <Box sx={{ pb: 2 }}>
-            <TextField
-              fullWidth
-              required
-              label="Tags"
-              name="tags"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              margin="normal"
-              placeholder={
-                chips?.length === 0 ? "Type and press Enter to add tags" : ""
-              }
-              error={chips?.length === 0 ? error : null}
-              helperText={chips?.length === 0 ? helperText : null}
-              sx={{ borderRadius: 4, pb: 0.75 }}
-            />
-            <Box
-              sx={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 1,
-                pointerEvents: "none",
-                "& .MuiChip-root": {
-                  pointerEvents: "auto",
-                },
-              }}
-            >
-              {chips?.map((chip, index) => (
-                <Chip
-                  key={index}
-                  label={chip}
-                  onDelete={() => handleDelete(chip)}
-                />
-              ))}
-            </Box>
-          </Box>
-          <ReactQuill
-            theme="snow"
-            modules={modules}
-            required
-            value={newPost.body.content}
-            onChange={handleContentChange}
-            placeholder="Write your post content here..."
-            style={{
-              height: "300px",
-            }}
-            className="customEditor"
-          />
-        </Paper>
+        </Box>
+        <ReactQuill
+          theme="snow"
+          modules={modules}
+          required
+          value={newPost.body.content}
+          onChange={handleContentChange}
+          placeholder="Write your post content here..."
+          style={{
+            height: "300px",
+          }}
+          className="customEditor"
+        />
         <Box sx={{ my: 2 }}>
           <Button
             variant="contained"
@@ -399,20 +506,23 @@ const BlogWrite = () => {
                   <BlogCard
                     post={post}
                     onEdit={handlePostEdit}
-                    // onDelete={() => setDeleteDialogOpen(true)}
+                    onDelete={handleDeleteDialog}
                   />
                 </Grid>
               ))}
           </Grid>
         )}
       </Container>
-      {/* <Dialog
+      <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete this post?</Typography>
+          <Typography>
+            Are you sure you want to delete this post? Deletion is not
+            reversible, and the post will be completely deleted.
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button
@@ -422,19 +532,34 @@ const BlogWrite = () => {
           >
             Cancel
           </Button>
-          <Button onClick={handlePostDelete} color="error" variant="outlined">
+          <Button
+            onClick={handlePostDelete}
+            color="error"
+            variant="outlined"
+            sx={{
+              "&:hover": {
+                color: "white",
+                backgroundColor: "red",
+              },
+            }}
+          >
             Delete
           </Button>
         </DialogActions>
-      </Dialog> */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+      </Dialog>
+      <Dialog
+        fullWidth
+        maxWidth="md"
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+      >
         <DialogTitle>Edit Post</DialogTitle>
         <DialogContent>
           <TextField
             required
             autoFocus
             fullWidth
-            label="Title"
+            placeholder="Title"
             value={editingPost?.title}
             onChange={(e) =>
               setEditingPost((prev) => ({ ...prev, title: e.target.value }))
@@ -444,10 +569,13 @@ const BlogWrite = () => {
             helperText={editingPost?.title === "" ? helperText : null}
           />
           <TextField
-            label="Author"
+            placeholder="Author"
             value={editingPost?.author.name}
             onChange={(e) =>
-              setEditingPost((prev) => ({ ...prev, author: e.target.value }))
+              setEditingPost((prev) => ({
+                ...prev,
+                author: { ...prev.author, name: e.target.value },
+              }))
             }
             fullWidth
             margin="normal"
@@ -455,11 +583,61 @@ const BlogWrite = () => {
             error={editingPost?.author.name === "" ? error : null}
             helperText={editingPost?.author.name === "" ? helperText : null}
           />
+          {/* <TextField
+            fullWidth
+            required
+            value={editingPost?.body.tags}
+            onChange={(e) =>
+              setEditingPost((prev) => ({
+                ...prev,
+                body: { ...prev.body, tags: e.target.value },
+              }))
+            }
+            onKeyDown={handleKeyDown}
+            margin="normal"
+            placeholder={
+              chips?.length === 0 ? "Type and press Enter to add tags" : ""
+            }
+            error={chips?.length === 0 ? error : null}
+            helperText={chips?.length === 0 ? helperText : null}
+            sx={{ borderRadius: 4, pb: 0.75 }}
+          />
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              pointerEvents: "none",
+              "& .MuiChip-root": {
+                pointerEvents: "auto",
+              },
+            }}
+          >
+            {chips?.map((chip, index) => (
+              <Chip
+                key={index}
+                label={chip}
+                onDelete={() => handleDelete(chip)}
+              />
+            ))}
+          </Box> */}
           <ReactQuill
             theme="snow"
             required
             value={editingPost?.body.content || ""}
-            onChange={(body) => setEditingPost((prev) => ({ ...prev, body }))}
+            style={{
+              height: "300px",
+            }}
+            className="customEditor"
+            onChange={(content) =>
+              setEditingPost((prev) => ({
+                ...prev,
+                body: {
+                  ...prev.body,
+                  content,
+                },
+              }))
+            }
           />
         </DialogContent>
         <DialogActions>
@@ -470,5 +648,4 @@ const BlogWrite = () => {
     </>
   );
 };
-
 export default BlogWrite;

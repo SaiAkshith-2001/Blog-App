@@ -11,10 +11,13 @@ import {
   MenuItem,
   Chip,
   Stack,
+  ListItemIcon,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
 import { format } from "timeago.js";
+import DOMPurify from "dompurify";
+
 const MoreVertIcon = lazy(() => import("@mui/icons-material/MoreVert"));
 const DeleteIcon = lazy(() => import("@mui/icons-material/Delete"));
 const EditIcon = lazy(() => import("@mui/icons-material/Edit"));
@@ -39,8 +42,8 @@ function stringToColor(string) {
   let hash = 0;
   let i;
   /* eslint-disable no-bitwise */
-  for (i = 0; i < string.length; i += 1) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  for (i = 0; i < string?.length; i += 1) {
+    hash = string?.charCodeAt(i) + ((hash << 5) - hash);
   }
   let color = "#";
   for (i = 0; i < 3; i += 1) {
@@ -57,7 +60,7 @@ function stringAvatar(name) {
       mr: 1,
       bgcolor: stringToColor(name),
     },
-    children: `${name.split(" ")[0][0]}${name?.split(" ")[1]?.[0] || ""}`,
+    children: `${name?.split(" ")[0][0]}${name?.split(" ")[1]?.[0] || ""}`,
   };
 }
 
@@ -89,14 +92,16 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
   const handleCardClick = () => {
     navigate(`/posts/${post?._id}`);
   };
-  const renderContent = (content) => {
-    const wordLimit = 30;
-    const words = content.split(" ");
-    if (content.length > wordLimit) {
+  const renderContent = (content, wordLimit) => {
+    const words = content?.split(" ");
+    if (content?.length > wordLimit) {
       return words.slice(0, wordLimit).join(" ") + "...";
     }
     return content;
   };
+  const sanitizedContent = DOMPurify.sanitize(post?.body?.content, {
+    USE_PROFILES: { html: true },
+  });
   return (
     <StyledCard variant="outlined" onClick={handleCardClick}>
       <CardHeader
@@ -114,43 +119,43 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <MenuItem>
-                <IconButton>
+                <ListItemIcon>
                   <PushPin />
-                </IconButton>
+                </ListItemIcon>
                 Pin
               </MenuItem>
-              <MenuItem>
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(post);
-                  }}
-                >
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(post);
+                }}
+              >
+                <ListItemIcon>
                   <EditIcon />
-                </IconButton>
+                </ListItemIcon>
                 Edit
               </MenuItem>
-              <MenuItem>
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(post._id);
-                  }}
-                >
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(post);
+                }}
+              >
+                <ListItemIcon>
                   <DeleteIcon />
-                </IconButton>
+                </ListItemIcon>
                 Delete
               </MenuItem>
               <MenuItem>
-                <IconButton>
+                <ListItemIcon>
                   <ShareIcon />
-                </IconButton>
+                </ListItemIcon>
                 Share
               </MenuItem>
               <MenuItem>
-                <IconButton>
+                <ListItemIcon>
                   <FlagIcon />
-                </IconButton>
+                </ListItemIcon>
                 Report
               </MenuItem>
             </Menu>
@@ -164,7 +169,7 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
         component="img"
         height="200"
         image={`https://images.unsplash.com/photo-1516414447565-b14be0adf13e`}
-        alt={post.title}
+        alt={post?.title}
       />
       <StyledCardContent>
         <Typography
@@ -173,11 +178,16 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
           component="div"
           sx={{ fontWeight: "bold" }}
         >
-          {post.title}
+          {renderContent(post?.title, 10)}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {renderContent(post.body?.content?.replace(/<\/?[^>]+(>|$)/g, ""))}
-        </Typography>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ mt: 1 }}
+          dangerouslySetInnerHTML={{
+            __html: renderContent(sanitizedContent, 5),
+          }}
+        />
         <Stack
           sx={{
             display: "flex",

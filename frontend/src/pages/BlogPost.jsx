@@ -11,12 +11,24 @@ import {
   Avatar,
   Chip,
   TextField,
+  Menu,
+  MenuItem,
+  ListItemIcon,
 } from "@mui/material";
 import axios from "axios";
 import { convertDate } from "./BlogCard";
 import { useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
-const ShareIcon = lazy(() => import("@mui/icons-material/Share"));
+import {
+  TwitterShareButton,
+  XIcon,
+  LinkedinShareButton,
+  LinkedinIcon,
+} from "react-share";
+const ContentCopyRoundedIcon = lazy(() =>
+  import("@mui/icons-material/ContentCopyRounded")
+);
+const MoreVertIcon = lazy(() => import("@mui/icons-material/MoreVert"));
 const FavoriteIcon = lazy(() => import("@mui/icons-material/Favorite"));
 const SendRoundedIcon = lazy(() => import("@mui/icons-material/SendRounded"));
 const CommentIcon = lazy(() => import("@mui/icons-material/Comment"));
@@ -25,7 +37,23 @@ const BlogPost = () => {
   const [postDetails, setPostDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isCopied, setIsCopied] = useState(false);
+  const currentUrl = window.location.href;
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    });
+    // console.log(currentUrl);
+  };
+  const handleMoreOptions = (event) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMoreOptionsClose = () => {
+    setAnchorEl(null);
+  };
   const getPostDetails = async () => {
     setIsLoading(true);
     const token = JSON.parse(localStorage.getItem("tokens"));
@@ -70,31 +98,12 @@ const BlogPost = () => {
     //   ALLOWED_TAGS: [
     //     "b",
     //     "p",
-    //     "u",
-    //     "i",
-    //     "em",
-    //     "strong",
     //     "a",
     //     "img",
-    //     "span",
     //     "h1",
     //     "h2",
-    //     "h3",
-    //     "h4",
-    //     "h5",
-    //     "h6",
-    //     "tabel",
-    //     "tr",
-    //     "td",
-    //     "th",
-    //     "ul",
-    //     "ol",
-    //     "li",
-    //     "br",
-    //     "pre",
-    //     "blockquote",
     //   ], // Allow only these tags
-    //   ALLOWED_ATTR: ["href", "class", "src", "spellcheck"], // Allow only `href` attributes
+    //   ALLOWED_ATTR: ["href", "class", "src", "spellcheck"], // Allow only these attributes
   });
   return (
     <Container maxWidth="md" style={{ marginTop: "6rem" }}>
@@ -164,11 +173,44 @@ const BlogPost = () => {
               >
                 By {postDetails?.author?.name}
               </Typography>
-              <Tooltip title="Share" arrow>
-                <IconButton>
-                  <ShareIcon />
+              <Tooltip title="More" arrow>
+                <IconButton color="inherit" onClick={handleMoreOptions}>
+                  <MoreVertIcon />
                 </IconButton>
               </Tooltip>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMoreOptionsClose}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MenuItem onClick={copyToClipboard}>
+                  <ListItemIcon>
+                    <ContentCopyRoundedIcon />
+                  </ListItemIcon>
+                  {isCopied ? "Copied!" : "Copy Link"}
+                </MenuItem>
+                <Divider />
+                <MenuItem>
+                  <ListItemIcon>
+                    <TwitterShareButton
+                      url={currentUrl}
+                      title="Check this out!"
+                    >
+                      <XIcon size={24} round />
+                    </TwitterShareButton>
+                  </ListItemIcon>
+                  Share on X
+                </MenuItem>
+                <MenuItem>
+                  <ListItemIcon>
+                    <LinkedinShareButton url={currentUrl}>
+                      <LinkedinIcon size={24} round />
+                    </LinkedinShareButton>
+                  </ListItemIcon>
+                  Share on LinkedIn
+                </MenuItem>
+              </Menu>
             </Box>
           </Stack>
           <Divider />
@@ -195,10 +237,48 @@ const BlogPost = () => {
           >
             {postDetails?.body?.tags &&
               postDetails?.body?.tags.map((tag) => (
-                <Chip label={tag} key={tag} />
+                <Chip label={tag} key={tag} sx={{ fontWeight: "bold" }} />
               ))}
           </Stack>
-          <Divider />
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              m: 1,
+            }}
+          >
+            <Typography
+              component="span"
+              sx={{
+                height: 4,
+                width: 4,
+                backgroundColor: "#000",
+                borderRadius: 2,
+                mx: 1,
+              }}
+            ></Typography>
+            <Typography
+              component="span"
+              sx={{
+                height: 4,
+                width: 4,
+                backgroundColor: "#000",
+                borderRadius: 2,
+                mx: 1,
+              }}
+            ></Typography>
+            <Typography
+              component="span"
+              sx={{
+                height: 4,
+                width: 4,
+                backgroundColor: "#000",
+                mx: 1,
+                borderRadius: 2,
+              }}
+            ></Typography>
+          </Box>
           <TextField
             fullWidth
             required

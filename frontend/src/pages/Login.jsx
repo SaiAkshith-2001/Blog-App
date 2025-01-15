@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import * as Yup from "yup";
 import {
-  TextField,
   Button,
+  TextField,
   Container,
   Typography,
   Box,
@@ -17,7 +17,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AuthContext } from "../context/AuthContext";
 import { SnackbarContext } from "../context/SnackbarContext";
-
 const loginValidationSchema = Yup.object().shape({
   username: Yup.string()
     .required("Username is required")
@@ -135,7 +134,7 @@ const Login = () => {
         </Typography>
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
-            label="Username"
+            placeholder="Username"
             name="username"
             required
             variant="outlined"
@@ -147,7 +146,7 @@ const Login = () => {
             autoFocus
           />
           <TextField
-            label="Password"
+            placeholder="Password"
             name="password"
             required
             type={showPassword ? "text" : "password"}

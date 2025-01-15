@@ -35,11 +35,11 @@ const MarkdownEditor = () => {
         <Grid item xs={12} md={6}>
           <TextField
             autoFocus
-            label="Enter your markdown content here..."
+            placeholder="Enter your markdown content here..."
             value={markDownContent}
             onChange={handleChange}
             multiline
-            rows={16}
+            rows={15}
             variant="outlined"
             fullWidth
           />
@@ -51,9 +51,10 @@ const MarkdownEditor = () => {
         <Grid item xs={12} md={6}>
           <Box
             sx={{
+              overflowY: "auto",
               border: "1px solid #ddd",
               padding: 2,
-              borderRadius: 1,
+              borderRadius: "40px",
               minHeight: "400px",
             }}
           >

@@ -129,7 +129,7 @@ const Register = () => {
         </Typography>
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
-            label="Username"
+            placeholder="Username"
             name="username"
             required
             variant="outlined"
@@ -141,7 +141,7 @@ const Register = () => {
             autoFocus
           />
           <TextField
-            label="Email"
+            placeholder="Email"
             name="email"
             required
             variant="outlined"
@@ -152,7 +152,7 @@ const Register = () => {
             helperText={errors.email?.message}
           />
           <TextField
-            label="Password"
+            placeholder="Password"
             name="password"
             required
             variant="outlined"
@@ -173,7 +173,7 @@ const Register = () => {
             }}
           />
           <TextField
-            label="Confirm Password"
+            placeholder="Confirm Password"
             name="confirmPassword"
             required
             variant="outlined"

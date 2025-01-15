@@ -18,13 +18,14 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  ListItemIcon,
 } from "@mui/material";
 import LoadingBar from "react-top-loading-bar";
 import { AuthContext } from "./context/AuthContext";
-import ProtectedRoute from "./component/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 import AskAI from "./pages/AskAI";
 import logo from "./assests/logo512.png";
-const MarkdownContent = lazy(() => import("./component/MarkdownContent"));
+const MarkdownContent = lazy(() => import("./components/MarkdownContent"));
 const BlogComment = lazy(() => import("./pages/BlogComment"));
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
@@ -36,9 +37,10 @@ const BlogRead = lazy(() => import("./pages/BlogRead"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const Insights = lazy(() => import("./pages/Insights"));
 const BlogWrite = lazy(() => import("./pages/BlogWrite"));
-const ThemeToggleButton = lazy(() => import("./component/ToggleButton"));
+const ThemeToggleButton = lazy(() => import("./components/ToggleButton"));
 const MenuIcon = lazy(() => import("@mui/icons-material/Menu"));
 const PersonIcon = lazy(() => import("@mui/icons-material/Person"));
+const LogoutIcon = lazy(() => import("@mui/icons-material/Logout"));
 function App(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -253,6 +255,9 @@ function App(props) {
                 ]
               ) : (
                 <MenuItem component={Link} to="/" onClick={handleLogout}>
+                  <ListItemIcon sx={{ color: "red" }}>
+                    <LogoutIcon />
+                  </ListItemIcon>
                   Logout
                 </MenuItem>
               )}
