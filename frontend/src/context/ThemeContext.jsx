@@ -17,6 +17,55 @@ const ThemeProvider = ({ children }) => {
         palette: {
           mode: darkMode ? "dark" : "light",
         },
+        components: {
+          MuiButton: {
+            styleOverrides: {
+              root: {
+                borderRadius: "24px",
+              },
+
+              contained: {
+                textTransform: "none",
+                borderRadius: "24px",
+              },
+              outlined: {
+                textTransform: "none",
+                borderRadius: "24px",
+              },
+              text: {
+                // textTransform: "none",
+                // borderRadius: "24px",
+              },
+            },
+          },
+          MuiTextField: {
+            styleOverrides: {
+              root: {
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "40px",
+                  "& fieldset": {
+                    borderRadius: "40px",
+                  },
+                  "& .MuiOutlinedInput-input": {
+                    padding: "16px 24px",
+                  },
+                },
+                "& .MuiFilledInput-root": {
+                  borderRadius: "24px",
+                  "& fieldset": {
+                    borderRadius: "24px",
+                  },
+                },
+                "& .MuiInput-root": {
+                  borderRadius: "24px",
+                  "& fieldset": {
+                    borderRadius: "24px",
+                  },
+                },
+              },
+            },
+          },
+        },
       }),
     [darkMode]
   );
