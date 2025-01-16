@@ -28,6 +28,8 @@ const BlogRead = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const url = "https://blog-app-backend-0nmz.onrender.com";
+
   const getNews = async () => {
     if (!hasMore) return;
     setIsLoading(true);

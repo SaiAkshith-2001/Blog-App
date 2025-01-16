@@ -40,6 +40,8 @@ const BlogPost = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isCopied, setIsCopied] = useState(false);
   const currentUrl = window.location.href;
+  const url = "https://blog-app-backend-0nmz.onrender.com";
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(currentUrl).then(() => {
       setIsCopied(true);

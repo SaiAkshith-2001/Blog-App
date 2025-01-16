@@ -13,6 +13,8 @@ import SendRoundedIcon from "@mui/icons-material/SendRounded";
 const AskAI = () => {
   const [prompt, setPrompt] = useState("");
   const [promptResponse, setPromptResponse] = useState("");
+  const url = "https://blog-app-backend-0nmz.onrender.com";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

@@ -47,6 +47,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const navigate = useNavigate();
+  const url = "https://blog-app-backend-0nmz.onrender.com";
 
   const handleRoleChange = (event) => {
     setSelectedRole(event.target.value);
