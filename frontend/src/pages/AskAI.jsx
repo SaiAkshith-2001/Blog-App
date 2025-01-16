@@ -16,7 +16,7 @@ const AskAI = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/api/askai", {
+      const response = await axios.post(`${url}/api/askai`, {
         prompt,
       });
       // const data = await response.json();

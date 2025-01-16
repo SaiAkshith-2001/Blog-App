@@ -32,7 +32,7 @@ const BlogRead = () => {
     if (!hasMore) return;
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/posts/read");
+      const response = await axios.get(`${url}/api/posts/read`);
       const data = response.data.posts;
       // console.log(data);
       setIsLoading(false);

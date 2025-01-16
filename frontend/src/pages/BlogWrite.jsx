@@ -54,7 +54,6 @@ const BlogWrite = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
   const [editingPost, setEditingPost] = useState({
     title: "",
     author: { name: "", email: "" },
@@ -68,6 +67,8 @@ const BlogWrite = () => {
     body: { category: "", content: "", tags: [] },
   });
   const [deletePost, setDeletePost] = useState(null);
+  const url = "https://blog-app-backend-0nmz.onrender.com";
+
   const fetchPosts = async () => {
     setIsLoading(true);
     // try {
@@ -88,12 +89,9 @@ const BlogWrite = () => {
     // }
     const token = JSON.parse(localStorage.getItem("tokens"));
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/posts/write",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axios.get(`${url}/api/posts/write`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = response.data.posts;
       // console.log(data);
       setIsLoading(false);
@@ -136,7 +134,7 @@ const BlogWrite = () => {
     const token = JSON.parse(localStorage.getItem("tokens"));
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/posts/write",
+        `${url}/api/posts/write`,
         {
           title: newPost.title,
           author: { name: newPost.author.name, email: newPost.author.email },
@@ -202,7 +200,7 @@ const BlogWrite = () => {
     const token = JSON.parse(localStorage.getItem("tokens"));
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/posts/read/post/${deletePost._id}`,
+        `${url}/api/posts/read/post/${deletePost._id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -257,7 +255,7 @@ const BlogWrite = () => {
     try {
       setIsLoading(true);
       const response = await axios.put(
-        `http://localhost:5000/api/posts/read/post/${editingPost._id}`,
+        `${url}/api/posts/read/post/${editingPost._id}`,
         {
           title: editingPost.title.trim(),
           author: {

@@ -58,14 +58,11 @@ const BlogPost = () => {
     setIsLoading(true);
     const token = JSON.parse(localStorage.getItem("tokens"));
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/posts/read/post/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`${url}/api/posts/read/post/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = response.data.post;
       setIsLoading(false);
       setPostDetails(data);
