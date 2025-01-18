@@ -21,12 +21,10 @@ import {
 import { SnackbarContext } from "../context/SnackbarContext";
 import axios from "axios";
 import BlogCard from "./BlogCard";
-import { ImageResize } from "quill-image-resize-module-ts";
 import "react-quill/dist/quill.snow.css";
 import "../index.css";
-import { Quill } from "react-quill";
-Quill.register("modules/imageResize", ImageResize);
 const ReactQuill = lazy(() => import("react-quill"));
+
 const modules = {
   toolbar: [
     ["bold", "italic", "underline", "strike"],
@@ -44,7 +42,6 @@ const modules = {
     [{ align: [] }],
     ["clean"], // remove formatting button
   ],
-  imageResize: true,
 };
 const BlogWrite = () => {
   const { setSnackbar } = useContext(SnackbarContext);
@@ -124,15 +121,17 @@ const BlogWrite = () => {
       setInputValue("");
       setError(false);
       setHelperText("");
-
       // Close any open dialogs
       setDialogOpen(false);
       setDeleteDialogOpen(false);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const handleCreatePost = async () => {
     const token = JSON.parse(localStorage.getItem("tokens"));
     try {
+      setIsLoading(true);
+      //eslint-disable-next-line
       const response = await axios.post(
         `${url}/api/posts/write`,
         {
@@ -152,6 +151,7 @@ const BlogWrite = () => {
       );
       //console.log(response.data);
       const post = { ...newPost, id: Date.now() };
+      setIsLoading(false);
       setPosts((prev) => [post, ...prev]);
       setSnackbar({
         open: true,
@@ -198,6 +198,7 @@ const BlogWrite = () => {
   };
   const handlePostDelete = async () => {
     const token = JSON.parse(localStorage.getItem("tokens"));
+    setIsLoading(true);
     try {
       const response = await axios.delete(
         `${url}/api/posts/read/post/${deletePost._id}`,
@@ -209,6 +210,7 @@ const BlogWrite = () => {
       );
       if (response.status === 204) {
         setPosts(posts.filter((post) => post._id !== deletePost._id));
+        setIsLoading(false);
         setDeleteDialogOpen(false);
         setDeletePost(null);
         setSnackbar({
@@ -229,6 +231,7 @@ const BlogWrite = () => {
       });
     } finally {
       setDeleteDialogOpen(false);
+      setIsLoading(false);
       setDeletePost(null);
     }
   };
@@ -281,6 +284,7 @@ const BlogWrite = () => {
             post._id === editingPost._id ? editingPost : post
           )
         );
+        setIsLoading(false);
         setDialogOpen(false);
         setSnackbar({
           open: true,
@@ -488,8 +492,13 @@ const BlogWrite = () => {
             variant="contained"
             color="primary"
             onClick={handleCreatePost}
+            disabled={isLoading}
           >
-            Create Post
+            {isLoading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Create Post"
+            )}
           </Button>
         </Box>
         {isLoading ? (
@@ -534,6 +543,7 @@ const BlogWrite = () => {
             onClick={handlePostDelete}
             color="error"
             variant="outlined"
+            disabled={isLoading}
             sx={{
               "&:hover": {
                 color: "white",
@@ -541,7 +551,11 @@ const BlogWrite = () => {
               },
             }}
           >
-            Delete
+            {isLoading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Delete"
+            )}
           </Button>
         </DialogActions>
       </Dialog>
@@ -640,7 +654,13 @@ const BlogWrite = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleUpdatePost}>Save</Button>
+          <Button onClick={handleUpdatePost} disabled={isLoading}>
+            {isLoading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Save"
+            )}
+          </Button>
         </DialogActions>
       </Dialog>
     </>

@@ -10,6 +10,7 @@ import {
   Box,
   IconButton,
   Tooltip,
+  CircularProgress,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -172,7 +173,11 @@ const Login = () => {
             sx={{ textTransform: "none", my: "2rem" }}
             disabled={isSubmitting}
           >
-            Login
+            {isSubmitting ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Login"
+            )}
           </Button>
           <Button
             variant="outlined"

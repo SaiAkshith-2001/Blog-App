@@ -74,6 +74,7 @@ const BlogPost = () => {
   };
   useEffect(() => {
     getPostDetails();
+    // eslint-disable-next-line
   }, []);
   //   const handleScroll = useCallback(() => {
   //     // console.log(window.innerHeight);

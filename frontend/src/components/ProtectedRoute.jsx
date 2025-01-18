@@ -29,7 +29,7 @@ const ProtectedRoute = () => {
       });
       navigate("/login");
     }
-  }, [authTokens, isTokenExpired, setAuthTokens, setSnackbar, navigate]);
+  }, [authTokens, setAuthTokens, setSnackbar, navigate]);
   if (user && authTokens && !isTokenExpired(authTokens)) {
     return <Outlet />;
   } else {

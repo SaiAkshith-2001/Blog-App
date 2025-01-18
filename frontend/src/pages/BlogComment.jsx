@@ -47,6 +47,7 @@ const BlogRead = () => {
   };
   useEffect(() => {
     getPostDetails();
+    // eslint-disable-next-line
   }, []);
 
   //   const handleScroll = useCallback(() => {

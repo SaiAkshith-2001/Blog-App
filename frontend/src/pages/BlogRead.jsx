@@ -26,7 +26,7 @@ const BlogRead = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [newsData, setNewsData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1); // eslint-disable-line no-unused-vars
   const [hasMore, setHasMore] = useState(true);
   const url = "https://blog-app-backend-0nmz.onrender.com";
 
@@ -49,28 +49,31 @@ const BlogRead = () => {
   };
   useEffect(() => {
     getNews();
+    // eslint-disable-next-line
   }, []);
   // }, [page]);
-  const handleScroll = () => {
-    // console.log(window.innerHeight);
-    // console.log(document.documentElement.scrollTop);
-    // console.log(document.documentElement.scrollHeight);
-    try {
-      if (
-        window.innerHeight + document.documentElement.scrollTop + 1 >=
-        document.documentElement.scrollHeight
-      ) {
-        setIsLoading(true);
-        setPage((prev) => prev + 1);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+
   useEffect(() => {
+    const handleScroll = () => {
+      // console.log(window.innerHeight);
+      // console.log(document.documentElement.scrollTop);
+      // console.log(document.documentElement.scrollHeight);
+      try {
+        if (
+          window.innerHeight + document.documentElement.scrollTop + 1 >=
+          document.documentElement.scrollHeight
+        ) {
+          setIsLoading(true);
+          setPage((prev) => prev + 1);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);

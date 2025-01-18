@@ -114,7 +114,7 @@ function App(props) {
 
   const container =
     window !== undefined ? () => window().document.body : undefined;
-  const open = Boolean(anchorEl);
+  const open = Boolean(anchorEl); // eslint-disable-line no-unused-vars
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);

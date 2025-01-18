@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
-import { format } from "timeago.js";
+// import { format } from "timeago.js";
 import DOMPurify from "dompurify";
 
 const MoreVertIcon = lazy(() => import("@mui/icons-material/MoreVert"));
@@ -24,18 +24,24 @@ const EditIcon = lazy(() => import("@mui/icons-material/Edit"));
 const ShareIcon = lazy(() => import("@mui/icons-material/Share"));
 const FlagIcon = lazy(() => import("@mui/icons-material/Flag"));
 const PushPin = lazy(() => import("@mui/icons-material/PushPin"));
+
 export const convertDate = (dateStr) => {
+  if (!dateStr) {
+    console.error("Invalid date string:", dateStr);
+    return "Invalid Date"; // Handle invalid cases gracefully
+  }
   const date = new Date(dateStr);
+  if (isNaN(date)) {
+    console.error("Failed to parse date:", dateStr);
+    return "Invalid Date";
+  }
   const options = {
     year: "numeric",
-    month: "short", // Full month name
-    day: "numeric", // Numeric day
-    // hour: "numeric", // Hour
-    // minute: "numeric", // Minute
-    // hour12: true, // 12-hour format
+    month: "short", // Abbreviated month name
+    day: "numeric",
   };
-  const formatter = new Intl.DateTimeFormat("en-US", options);
-  const formattedDate = formatter.format(date);
+  const formattedDate = date.toLocaleDateString(options);
+  console.log(date.toLocaleDateString(options));
   return formattedDate;
 };
 function stringToColor(string) {
@@ -53,7 +59,6 @@ function stringToColor(string) {
   /* eslint-enable no-bitwise */
   return color;
 }
-
 function stringAvatar(name) {
   return {
     sx: {
@@ -162,8 +167,7 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
           </>
         }
         title={post.author?.name}
-        subheader={format(post?.createdAt)}
-        // subheader={convertDate(post?.createdAt)}
+        // subheader={format(post?.createdAt)}
       />
       <CardMedia
         component="img"

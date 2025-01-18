@@ -16,7 +16,6 @@
     "dompurify": "^3.2.3",
     "jwt-decode": "^4.0.0",
     "quill": "^2.0.2",
-    "quill-image-resize-module-ts": "^3.0.3",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
@@ -30,7 +29,7 @@
     "react-share": "^5.1.2",
     "react-simple-typewriter": "^5.0.1",
     "react-top-loading-bar": "^2.3.1",
-    "timeago.js": "^4.0.0-beta.3",
+    "timeago.js": "^4.0.2",
     "web-vitals": "^2.1.4",
     "yup": "^1.4.0"
   },

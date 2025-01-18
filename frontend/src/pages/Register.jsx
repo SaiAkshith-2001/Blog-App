@@ -11,6 +11,7 @@ import {
   FormControlLabel,
   FormControl,
   Radio,
+  CircularProgress,
 } from "@mui/material";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -71,6 +72,7 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     try {
+      //eslint-disable-next-line
       const response = await axios.post(`${url}/api/user/register`, {
         email: data.email,
         username: data.username,
@@ -209,7 +211,11 @@ const Register = () => {
             sx={{ textTransform: "none", my: 2 }}
             disabled={isSubmitting}
           >
-            Register
+            {isSubmitting ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Register"
+            )}
           </Button>
           <Typography sx={{ alignItems: "center" }}>
             Already have an account?{" "}
