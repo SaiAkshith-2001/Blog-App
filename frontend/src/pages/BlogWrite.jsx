@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { SnackbarContext } from "../context/SnackbarContext";
 import axios from "axios";
-import BlogCard from "./BlogCard";
+import BlogCard from "../components/BlogCard";
 import "react-quill/dist/quill.snow.css";
 import "../index.css";
 const ReactQuill = lazy(() => import("react-quill"));
@@ -64,7 +64,7 @@ const BlogWrite = () => {
     body: { category: "", content: "", tags: [] },
   });
   const [deletePost, setDeletePost] = useState(null);
-  const url = "https://blog-app-backend-0nmz.onrender.com";
+  const url = process.env.REACT_APP_API_URL;
 
   const fetchPosts = async () => {
     setIsLoading(true);

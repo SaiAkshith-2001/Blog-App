@@ -51,6 +51,80 @@ function App(props) {
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
+  const navItems = [
+    {
+      text: "Home",
+      path: "/",
+    },
+    {
+      text: "Posts",
+      path: "/read",
+    },
+    {
+      text: "Write",
+      path: "/write",
+    },
+    {
+      text: "Editor",
+      path: "/editor",
+    },
+    {
+      text: "Content",
+      path: "/md",
+    },
+    {
+      text: "About",
+      path: "/about",
+    },
+  ];
+  const publicRouteConfig = [
+    {
+      component: <Home />,
+      path: "/",
+    },
+    {
+      component: <Login />,
+      path: "/login",
+    },
+    {
+      component: <Register />,
+      path: "/register",
+    },
+    {
+      component: <About />,
+      path: "/about",
+    },
+  ];
+  const protectedRouteConfig = [
+    {
+      component: <BlogWrite />,
+      path: "/write",
+    },
+    {
+      component: <NoteEditor />,
+      path: "/editor",
+    },
+    {
+      component: <MarkdownContent />,
+      path: "/md",
+    },
+    {
+      component: <AskAI />,
+      path: "/askai",
+    },
+    {
+      component: <BlogPost />,
+      path: "/posts/:id/",
+    },
+    {
+      component: <BlogComment />,
+      path: "/posts/:id/comments",
+    },
+    {
+      component: <Insights />,
+      path: "/insights",
+    },
+  ];
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2 }}>
@@ -58,56 +132,17 @@ function App(props) {
       </Typography>
       <Divider />
       <List>
-        <ListItem disablePadding>
-          <ListItemButton sx={{ textAlign: "center" }} component={Link} to="/">
-            <ListItemText>Home</ListItemText>
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            sx={{ textAlign: "center" }}
-            component={Link}
-            to="/read"
-          >
-            <ListItemText>Posts</ListItemText>
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            sx={{ textAlign: "center" }}
-            component={Link}
-            to="/write"
-          >
-            <ListItemText>Write</ListItemText>
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            sx={{ textAlign: "center" }}
-            component={Link}
-            to="/editor"
-          >
-            <ListItemText>Editor</ListItemText>
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            sx={{ textAlign: "center" }}
-            component={Link}
-            to="/md"
-          >
-            <ListItemText>Content</ListItemText>
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            sx={{ textAlign: "center" }}
-            component={Link}
-            to="/about"
-          >
-            <ListItemText>About</ListItemText>
-          </ListItemButton>
-        </ListItem>
+        {navItems.map((item) => (
+          <ListItem disablePadding key={item.text}>
+            <ListItemButton
+              sx={{ textAlign: "center" }}
+              component={Link}
+              to={item.path}
+            >
+              <ListItemText>{item.text}</ListItemText>
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
     </Box>
   );
@@ -177,54 +212,17 @@ function App(props) {
                 display: { xs: "none", sm: "block" },
               }}
             >
-              <Button
-                color="inherit"
-                component={Link}
-                to="/"
-                onClick={() => setProgress(100)}
-              >
-                Home
-              </Button>
-              <Button
-                color="inherit"
-                component={Link}
-                to="/write"
-                onClick={() => setProgress(100)}
-              >
-                Write
-              </Button>
-              <Button
-                color="inherit"
-                component={Link}
-                to="/read"
-                onClick={() => setProgress(100)}
-              >
-                Posts
-              </Button>
-              {/* <Button
-                color="inherit"
-                component={Link}
-                to="/editor"
-                onClick={() => setProgress(100)}
-              >
-                Editor
-              </Button> */}
-              <Button
-                color="inherit"
-                component={Link}
-                to="/md"
-                onClick={() => setProgress(100)}
-              >
-                Editor
-              </Button>
-              <Button
-                color="inherit"
-                component={Link}
-                to="/about"
-                onClick={() => setProgress(100)}
-              >
-                About
-              </Button>
+              {navItems.map((item) => (
+                <Button
+                  key={item.text}
+                  color="inherit"
+                  component={Link}
+                  to={item.path}
+                  onClick={() => setProgress(100)}
+                >
+                  {item.text}
+                </Button>
+              ))}
             </Box>
             <Tooltip title="Profile" arrow>
               <IconButton color="inherit" onClick={handleMenuOpen}>
@@ -300,21 +298,16 @@ function App(props) {
       >
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/about" element={<About />} />
+          {publicRouteConfig.map((item) => (
+            <Route path={item.path} element={item.component} />
+          ))}
           {/* Guest User */}
           <Route path="/read" element={<BlogRead />} />
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/write" element={<BlogWrite />} />
-            <Route path="/editor" element={<NoteEditor />} />
-            <Route path="/insights" element={<Insights />} />
-            <Route path="/posts/:id/" element={<BlogPost />} />
-            <Route path="/posts/:id/comments" element={<BlogComment />} />
-            <Route path="/md" element={<MarkdownContent />} />
-            <Route path="/askai" element={<AskAI />} />
+            {protectedRouteConfig.map((item) => (
+              <Route path={item.path} element={item.component} />
+            ))}
           </Route>
           {/* handling 404 page not found */}
           <Route path="/*" element={<NotFound />} />

@@ -16,7 +16,7 @@ import {
   ListItemIcon,
 } from "@mui/material";
 import axios from "axios";
-import { convertDate } from "./BlogCard";
+import { convertDate } from "../components/BlogCard";
 import { useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
 import {
@@ -40,14 +40,13 @@ const BlogPost = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isCopied, setIsCopied] = useState(false);
   const currentUrl = window.location.href;
-  const url = "https://blog-app-backend-0nmz.onrender.com";
+  const url = process.env.REACT_APP_API_URL;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(currentUrl).then(() => {
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     });
-    // console.log(currentUrl);
   };
   const handleMoreOptions = (event) => {
     event.stopPropagation();

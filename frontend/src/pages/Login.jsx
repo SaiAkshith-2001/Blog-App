@@ -39,7 +39,7 @@ const Login = () => {
   const { setSnackbar } = useContext(SnackbarContext);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const url = "https://blog-app-backend-0nmz.onrender.com";
+  const url = process.env.REACT_APP_API_URL;
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);

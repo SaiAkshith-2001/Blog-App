@@ -14,7 +14,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import BlogCard from "./BlogCard";
+import BlogCard from "../components/BlogCard";
 
 const StyledFab = styled(Fab)(({ theme }) => ({
   position: "fixed",
@@ -28,7 +28,7 @@ const BlogRead = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1); // eslint-disable-line no-unused-vars
   const [hasMore, setHasMore] = useState(true);
-  const url = "https://blog-app-backend-0nmz.onrender.com";
+  const url = process.env.REACT_APP_API_URL;
 
   const getNews = async () => {
     if (!hasMore) return;
