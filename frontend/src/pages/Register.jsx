@@ -192,9 +192,9 @@ const Register = () => {
                 value={selectedRole}
                 onChange={handleRoleChange}
               >
-                {roles.map((role) => (
+                {roles.map((role, index) => (
                   <FormControlLabel
-                    key={role}
+                    key={index}
                     value={role}
                     control={<Radio />}
                     label={<Typography>{role}</Typography>}

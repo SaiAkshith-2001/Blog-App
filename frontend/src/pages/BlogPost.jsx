@@ -16,9 +16,10 @@ import {
   ListItemIcon,
 } from "@mui/material";
 import axios from "axios";
-import { convertDate } from "../components/BlogCard";
+import { convertDate } from "../utils";
 import { useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
+import "../index.css";
 import {
   TwitterShareButton,
   XIcon,
@@ -111,7 +112,7 @@ const BlogPost = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <>
+        <React.Fragment>
           <Typography
             variant="h3"
             sx={{ fontWeight: "bold", lineHeight: 1.6 }}
@@ -129,6 +130,9 @@ const BlogPost = () => {
           >
             {postDetails?.body?.category}
           </Typography>
+          {/* <Typography variant="subtitle2">
+            {convertDate(postDetails?.createdAt)}
+          </Typography> */}
           <Divider />
           <Stack
             direction="row"
@@ -214,7 +218,9 @@ const BlogPost = () => {
           </Stack>
           <Divider />
           <Typography
+            className="quill-content"
             sx={{
+              textAlign: "justify",
               fontFamily: "Georgia, Times, 'Times New Roman', serif",
               fontSize: "1.25rem",
               lineHeight: 1.6,
@@ -235,8 +241,8 @@ const BlogPost = () => {
             }}
           >
             {postDetails?.body?.tags &&
-              postDetails?.body?.tags.map((tag) => (
-                <Chip label={tag} key={tag} sx={{ fontWeight: "bold" }} />
+              postDetails?.body?.tags.map((tag, index) => (
+                <Chip label={tag} key={index} sx={{ fontWeight: "bold" }} />
               ))}
           </Stack>
           <Box
@@ -299,9 +305,12 @@ const BlogPost = () => {
             }}
           />
           <Box sx={{ p: 2 }}>
-            {postDetails?.body?.interactions?.comments?.map((i) => (
-              <>
-                <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            {postDetails?.body?.interactions?.comments?.map((i, index) => (
+              <React.Fragment>
+                <Box
+                  key={index}
+                  sx={{ display: "flex", gap: 1, alignItems: "center" }}
+                >
                   <Avatar>{i?.username?.split(" ")[0][0]}</Avatar>
                   <Typography sx={{ fontWeight: "bold" }}>
                     {i?.username}
@@ -311,10 +320,10 @@ const BlogPost = () => {
                     {convertDate(i?.createdAt)}
                   </Typography>
                 </Box>
-              </>
+              </React.Fragment>
             ))}
           </Box>
-        </>
+        </React.Fragment>
       )}
     </Container>
   );

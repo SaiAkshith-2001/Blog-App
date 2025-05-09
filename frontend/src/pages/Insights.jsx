@@ -1,6 +1,6 @@
 import React from "react";
-import sourceData from "../assests/sourceData.json";
-import PostData from "../assests/PostData.json";
+import sourceData from "../assests/data/sourceData.json";
+import PostData from "../assests/data/PostData.json";
 import {
   Chart,
   CategoryScale,

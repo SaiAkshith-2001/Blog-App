@@ -40,6 +40,7 @@ const modules = {
     [{ color: [] }, { background: [] }], // dropdown with defaults from theme
     [{ font: [] }],
     [{ align: [] }],
+    ["image"],
     ["clean"], // remove formatting button
   ],
 };
@@ -428,8 +429,8 @@ const BlogWrite = () => {
                 borderRadius: "40px",
               }}
             >
-              {categoryOptions.map((option) => (
-                <MenuItem key={option} value={option}>
+              {categoryOptions.map((option, index) => (
+                <MenuItem key={index} value={option}>
                   {option}
                 </MenuItem>
               ))}

@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
-// import { format } from "timeago.js";
+import { convertDate, stringAvatar } from "../utils";
 import DOMPurify from "dompurify";
 
 const MoreVertIcon = lazy(() => import("@mui/icons-material/MoreVert"));
@@ -24,50 +24,6 @@ const EditIcon = lazy(() => import("@mui/icons-material/Edit"));
 const ShareIcon = lazy(() => import("@mui/icons-material/Share"));
 const FlagIcon = lazy(() => import("@mui/icons-material/Flag"));
 const PushPin = lazy(() => import("@mui/icons-material/PushPin"));
-
-export const convertDate = (dateStr) => {
-  if (!dateStr) {
-    console.error("Invalid date string:", dateStr);
-    return "Invalid Date"; // Handle invalid cases gracefully
-  }
-  const date = new Date(dateStr);
-  if (isNaN(date)) {
-    console.error("Failed to parse date:", dateStr);
-    return "Invalid Date";
-  }
-  const options = {
-    year: "numeric",
-    month: "short", // Abbreviated month name
-    day: "numeric",
-  };
-  const formattedDate = date.toLocaleDateString(options);
-  console.log(date.toLocaleDateString(options));
-  return formattedDate;
-};
-function stringToColor(string) {
-  let hash = 0;
-  let i;
-  /* eslint-disable no-bitwise */
-  for (i = 0; i < string?.length; i += 1) {
-    hash = string?.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  let color = "#";
-  for (i = 0; i < 3; i += 1) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-  /* eslint-enable no-bitwise */
-  return color;
-}
-function stringAvatar(name) {
-  return {
-    sx: {
-      mr: 1,
-      bgcolor: stringToColor(name),
-    },
-    children: `${name?.split(" ")[0][0]}${name?.split(" ")[1]?.[0] || ""}`,
-  };
-}
 
 const StyledCard = styled(Card)(({ theme }) => ({
   height: "100%",
@@ -167,7 +123,7 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
           </>
         }
         title={post.author?.name}
-        // subheader={format(post?.createdAt)}
+        subheader={convertDate(post?.createdAt)}
       />
       <CardMedia
         component="img"
@@ -204,8 +160,8 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
           }}
         >
           {post?.body?.tags &&
-            post?.body?.tags.map((tag) => (
-              <Chip label={tag} key={tag} sx={{ textOverflow: "ellipsis" }} />
+            post?.body?.tags.map((tag, index) => (
+              <Chip label={tag} key={index} sx={{ textOverflow: "ellipsis" }} />
             ))}
         </Stack>
       </StyledCardContent>

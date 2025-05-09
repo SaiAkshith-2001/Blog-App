@@ -1,5 +1,5 @@
 import React, { useState, useContext, lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Link } from "react-router-dom";
 import {
   AppBar,
   Box,
@@ -22,21 +22,9 @@ import {
 } from "@mui/material";
 import LoadingBar from "react-top-loading-bar";
 import { AuthContext } from "./context/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AskAI from "./pages/AskAI";
-import logo from "./assests/logo512.png";
-const MarkdownContent = lazy(() => import("./components/MarkdownContent"));
-const BlogComment = lazy(() => import("./pages/BlogComment"));
-const Home = lazy(() => import("./pages/Home"));
-const About = lazy(() => import("./pages/About"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const Login = lazy(() => import("./pages/Login"));
-const Register = lazy(() => import("./pages/Register"));
-const NoteEditor = lazy(() => import("./pages/Editor"));
-const BlogRead = lazy(() => import("./pages/BlogRead"));
-const BlogPost = lazy(() => import("./pages/BlogPost"));
-const Insights = lazy(() => import("./pages/Insights"));
-const BlogWrite = lazy(() => import("./pages/BlogWrite"));
+import { navItems } from "./utils/constants";
+import { AppRoutes } from "./routes";
+import logo from "./assests/images/logo512.png";
 const ThemeToggleButton = lazy(() => import("./components/ToggleButton"));
 const MenuIcon = lazy(() => import("@mui/icons-material/Menu"));
 const PersonIcon = lazy(() => import("@mui/icons-material/Person"));
@@ -51,80 +39,7 @@ function App(props) {
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
-  const navItems = [
-    {
-      text: "Home",
-      path: "/",
-    },
-    {
-      text: "Posts",
-      path: "/read",
-    },
-    {
-      text: "Write",
-      path: "/write",
-    },
-    {
-      text: "Editor",
-      path: "/editor",
-    },
-    {
-      text: "Content",
-      path: "/md",
-    },
-    {
-      text: "About",
-      path: "/about",
-    },
-  ];
-  const publicRouteConfig = [
-    {
-      component: <Home />,
-      path: "/",
-    },
-    {
-      component: <Login />,
-      path: "/login",
-    },
-    {
-      component: <Register />,
-      path: "/register",
-    },
-    {
-      component: <About />,
-      path: "/about",
-    },
-  ];
-  const protectedRouteConfig = [
-    {
-      component: <BlogWrite />,
-      path: "/write",
-    },
-    {
-      component: <NoteEditor />,
-      path: "/editor",
-    },
-    {
-      component: <MarkdownContent />,
-      path: "/md",
-    },
-    {
-      component: <AskAI />,
-      path: "/askai",
-    },
-    {
-      component: <BlogPost />,
-      path: "/posts/:id/",
-    },
-    {
-      component: <BlogComment />,
-      path: "/posts/:id/comments",
-    },
-    {
-      component: <Insights />,
-      path: "/insights",
-    },
-  ];
+
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2 }}>
@@ -132,8 +47,8 @@ function App(props) {
       </Typography>
       <Divider />
       <List>
-        {navItems.map((item) => (
-          <ListItem disablePadding key={item.text}>
+        {navItems.map((item, index) => (
+          <ListItem disablePadding key={index}>
             <ListItemButton
               sx={{ textAlign: "center" }}
               component={Link}
@@ -212,9 +127,9 @@ function App(props) {
                 display: { xs: "none", sm: "block" },
               }}
             >
-              {navItems.map((item) => (
+              {navItems.map((item, index) => (
                 <Button
-                  key={item.text}
+                  key={index}
                   color="inherit"
                   component={Link}
                   to={item.path}
@@ -296,22 +211,7 @@ function App(props) {
           </Box>
         }
       >
-        <Routes>
-          {/* Public Routes */}
-          {publicRouteConfig.map((item) => (
-            <Route path={item.path} element={item.component} />
-          ))}
-          {/* Guest User */}
-          <Route path="/read" element={<BlogRead />} />
-          {/* Protected Routes */}
-          <Route element={<ProtectedRoute />}>
-            {protectedRouteConfig.map((item) => (
-              <Route path={item.path} element={item.component} />
-            ))}
-          </Route>
-          {/* handling 404 page not found */}
-          <Route path="/*" element={<NotFound />} />
-        </Routes>
+        <AppRoutes />
         {/* <Box component="footer" sx={{ py: 4, mt: "auto", textAlign: "center" }}>
           <Typography variant="body2" color="textSecondary">
             Made with{" "}
