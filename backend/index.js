@@ -6,6 +6,7 @@ import { rateLimit } from "express-rate-limit";
 import { connectionDB } from "./src/config/db.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import postRoutes from "./src/routes/postRoutes.js";
+import helmet from "helmet";
 // import { Configuration, OpenAIApi } from "openai";
 
 const app = express();
@@ -13,6 +14,7 @@ dotenv.config();
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
+app.use(helmet());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -27,7 +29,7 @@ const limiter = rateLimit({
 
 const PORT = process.env.PORT || 8000;
 
-app.use("/api", limiter);
+app.use(limiter);
 app.use("/api/user", userRoutes);
 app.use("/api/posts", postRoutes);
 
