@@ -169,6 +169,7 @@ const BlogWrite = () => {
       setInputValue("");
       setHelperText("");
     } catch (error) {
+      setIsLoading(false);
       console.error("Something went wrong", error);
       if (error.response && error.response.status === 400) {
         setError(true);

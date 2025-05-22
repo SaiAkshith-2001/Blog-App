@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy } from "react";
+import React, { useState, useEffect, lazy, useContext } from "react";
 import {
   Container,
   Typography,
@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { convertDate } from "../utils";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import "../index.css";
 import {
@@ -26,6 +26,7 @@ import {
   LinkedinShareButton,
   LinkedinIcon,
 } from "react-share";
+import { SnackbarContext } from "../context/SnackbarContext";
 const ContentCopyRoundedIcon = lazy(() =>
   import("@mui/icons-material/ContentCopyRounded")
 );
@@ -40,8 +41,10 @@ const BlogPost = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isCopied, setIsCopied] = useState(false);
+  const { setSnackbar } = useContext(SnackbarContext);
   const currentUrl = window.location.href;
   const url = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(currentUrl).then(() => {
@@ -68,8 +71,17 @@ const BlogPost = () => {
       const data = response.data.post;
       setIsLoading(false);
       setPostDetails(data);
-    } catch (err) {
-      console.error("Error in fetching data, Please try again later!", err);
+    } catch (error) {
+      setIsLoading(false);
+      navigate("/");
+      console.error("Error in fetching data, Please try again later!", error);
+      if (error.response && error.response.status === 401) {
+        setSnackbar({
+          open: true,
+          message: "Invalid username (or) password , Please verify!",
+          severity: "error",
+        });
+      }
     }
   };
   useEffect(() => {

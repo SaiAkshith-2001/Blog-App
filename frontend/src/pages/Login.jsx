@@ -18,6 +18,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AuthContext } from "../context/AuthContext";
 import { SnackbarContext } from "../context/SnackbarContext";
+import { GoogleLogin } from "@react-oauth/google";
+
 const loginValidationSchema = Yup.object().shape({
   username: Yup.string()
     .required("Username is required")
@@ -44,7 +46,27 @@ const Login = () => {
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
-
+  const sendTokenToApi = async (idToken) => {
+    try {
+      await login(idToken);
+      if (idToken) {
+        setSnackbar({
+          open: true,
+          message: "Login successfully",
+          severity: "success",
+        });
+      }
+    } catch (error) {
+      console.error("Login failed", error);
+      if (error) {
+        setSnackbar({
+          open: true,
+          message: "Invalid username (or) password , Please try again!",
+          severity: "error",
+        });
+      }
+    }
+  };
   const onSubmit = async (data) => {
     try {
       const response = await axios.post(`${url}/api/user/login`, {
@@ -179,11 +201,23 @@ const Login = () => {
               "Login"
             )}
           </Button>
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              // console.log(credentialResponse);
+              sendTokenToApi(credentialResponse?.credential);
+              navigate("/read");
+            }}
+            onError={() => {
+              console.log("Login Failed");
+            }}
+            shape="pill"
+            theme="filled_black"
+          />
           <Button
             variant="outlined"
             color="primary"
             fullWidth
-            sx={{ textTransform: "none" }}
+            sx={{ mt: 3, textTransform: "none" }}
             onClick={redirectToRegister}
           >
             Create an account/Sign up

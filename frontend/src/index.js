@@ -6,31 +6,37 @@ import ThemeProvider from "../src/context/ThemeContext";
 import { Box, CircularProgress } from "@mui/material";
 import { AuthProvider } from "./context/AuthContext";
 import { SnackbarProvider } from "./context/SnackbarContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
+const clientID = process.env.REACT_APP_CLIENT_ID;
 
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <SnackbarProvider>
-        <ThemeProvider>
-          <Suspense
-            fallback={
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  position: "relative",
-                }}
-              >
-                <CircularProgress />
-              </Box>
-            }
-          >
-            <App />
-          </Suspense>
-        </ThemeProvider>
-      </SnackbarProvider>
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={clientID}>
+      <AuthProvider>
+        <SnackbarProvider>
+          <ThemeProvider>
+            <Suspense
+              fallback={
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    position: "relative",
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              }
+            >
+              <App />
+            </Suspense>
+          </ThemeProvider>
+        </SnackbarProvider>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>
 );

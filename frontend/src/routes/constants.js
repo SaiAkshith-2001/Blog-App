@@ -5,7 +5,7 @@ const Home = lazy(() => import("../pages/Home"));
 const About = lazy(() => import("../pages/About"));
 const Login = lazy(() => import("../pages/Login"));
 const Register = lazy(() => import("../pages/Register"));
-const NoteEditor = lazy(() => import("../pages/Editor"));
+// const NoteEditor = lazy(() => import("../pages/Editor"));
 const BlogPost = lazy(() => import("../pages/BlogPost"));
 const Insights = lazy(() => import("../pages/Insights"));
 const BlogWrite = lazy(() => import("../pages/BlogWrite"));
@@ -35,10 +35,10 @@ export const protectedRouteConfig = [
     component: <BlogWrite />,
     path: "/write",
   },
-  {
-    component: <NoteEditor />,
-    path: "/editor",
-  },
+  // {
+  //   component: <NoteEditor />,
+  //   path: "/editor",
+  // },
   {
     component: <MarkdownContent />,
     path: "/md",

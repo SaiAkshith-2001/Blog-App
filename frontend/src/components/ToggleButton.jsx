@@ -1,6 +1,6 @@
 import React, { useContext, lazy } from "react";
 import { ThemeContext } from "../context/ThemeContext";
-import { IconButton } from "@mui/material";
+import { IconButton, Tooltip } from "@mui/material";
 const LightModeIcon = lazy(() => import("@mui/icons-material/LightMode"));
 const DarkModeIcon = lazy(() => import("@mui/icons-material/DarkMode"));
 const ThemeToggleButton = () => {
@@ -14,7 +14,9 @@ const ThemeToggleButton = () => {
         transform: rotate ? "rotate(180deg)" : "rotate(0deg)",
       }}
     >
-      {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
+      <Tooltip title={darkMode ? "Light Mode" : "Dark Mode"} arrow>
+        {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
+      </Tooltip>
     </IconButton>
   );
 };

@@ -11,10 +11,10 @@ export const navItems = [
     text: "Write",
     path: "/write",
   },
-  {
-    text: "Editor",
-    path: "/editor",
-  },
+  // {
+  //   text: "Editor",
+  //   path: "/editor",
+  // },
   {
     text: "Content",
     path: "/md",
