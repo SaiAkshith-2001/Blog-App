@@ -1,5 +1,9 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.Schema.js";
+import dotenv from "dotenv";
+dotenv.config();
+import { verifyGoogleOAuthToken } from "./oauth.js";
+
 export const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -9,20 +13,25 @@ export const authMiddleware = async (req, res, next) => {
       });
     }
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select("-password");
-    if (!user) {
-      return res.status(401).json({
-        message: "User not found. Authorization denied.",
-      });
+    const decodedToken = jwt.decode(token);
+    if (decodedToken.iss && decodedToken.iss.includes("google")) {
+      verifyGoogleOAuthToken(req, res, next);
+    } else {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.userId).select("-password");
+      if (!user) {
+        return res.status(401).json({
+          message: "User not found. Authorization denied.",
+        });
+      }
+      if (!user.isActive) {
+        return res.status(403).json({
+          message: "Account is inactive. Please contact support.",
+        });
+      }
+      req.user = user;
+      next();
     }
-    if (!user.isActive) {
-      return res.status(403).json({
-        message: "Account is inactive. Please contact support.",
-      });
-    }
-    req.user = user;
-    next();
   } catch (error) {
     if (error.name === "JsonWebTokenError") {
       return res.status(401).json({

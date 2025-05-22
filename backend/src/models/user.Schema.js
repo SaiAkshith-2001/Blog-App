@@ -19,7 +19,16 @@ const userSchema = new mongoose.Schema(
         "Please fill a valid email address",
       ],
     },
-    password: { type: String, required: true, minlength: 8 },
+    password: {
+      type: String,
+      required: function () {
+        return this.authType === "local";
+      },
+      minlength: 8,
+    },
+    googleId: { type: String, unique: true, sparse: true },
+    authType: { type: String, enum: ["local", "google"], required: true },
+    profilePicture: { type: String },
     role: {
       type: String,
       enum: ["User", "Admin", "Guest"],

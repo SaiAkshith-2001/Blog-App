@@ -33,7 +33,7 @@ router.post(
   login
 );
 router
-  .route("/:id")
+  .route("/profile/:id")
   .get(getUserProfileById)
   .patch(authMiddleware, updateUserById)
   .delete(authMiddleware, deleteUserById);

@@ -81,7 +81,6 @@ export const login = async (req, res) => {
       },
       refreshToken: generateToken(user._id),
     });
-    await user.save();
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({
