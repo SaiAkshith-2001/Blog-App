@@ -37,9 +37,11 @@ const StyledCard = styled(Card)(({ theme }) => ({
     boxShadow: theme.shadows[4],
   },
 }));
+
 const StyledCardContent = styled(CardContent)({
   flexGrow: 1,
 });
+
 const BlogCard = ({ post, onEdit, onDelete }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
@@ -47,12 +49,15 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
   };
+
   const handleMoreOptionsClose = () => {
     setAnchorEl(null);
   };
+
   const handleCardClick = () => {
     navigate(`/posts/${post?._id}`);
   };
+
   const renderContent = (content, wordLimit) => {
     const words = content?.split(" ");
     if (content?.length > wordLimit) {
@@ -60,9 +65,18 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
     }
     return content;
   };
+
   const sanitizedContent = DOMPurify.sanitize(post?.body?.content, {
     USE_PROFILES: { html: true },
   });
+
+  const extractCoverFromPost = (content) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, "text/html");
+    const coverImg = doc.querySelector("img");
+    return coverImg?.src;
+  };
+
   return (
     <StyledCard variant="outlined" onClick={handleCardClick}>
       <CardHeader
@@ -128,7 +142,7 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
       <CardMedia
         component="img"
         height="200"
-        image={`https://images.unsplash.com/photo-1516414447565-b14be0adf13e`}
+        image={extractCoverFromPost(post?.body?.content)}
         alt={post?.title}
       />
       <StyledCardContent>

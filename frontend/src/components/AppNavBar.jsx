@@ -95,7 +95,7 @@ const AppNavBar = ({ window, theme }) => {
           bgcolor: "transparent",
           boxShadow: 0,
           backgroundImage: "none",
-          mt: "calc(var(--template-frame-height, 0px) + 16px)",
+          mt: "16px",
         }}
       >
         <Toolbar
@@ -105,8 +105,7 @@ const AppNavBar = ({ window, theme }) => {
             borderRadius: "16px",
             border: "1px solid rgba(255, 255, 255, 0.15)",
             boxShadow:
-              "0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(29, 29, 29, 0.2)",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.2)",
+              "0 8px 32px rgba(0, 0, 0, 0.1), inset 0 0 2px rgba(29, 29, 29, 0.15)",
             padding: "8px 16px",
           }}
         >
