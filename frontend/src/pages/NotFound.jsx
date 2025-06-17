@@ -1,4 +1,3 @@
-import React from "react";
 import { Container, Typography, Paper } from "@mui/material";
 
 const NotFound = () => {

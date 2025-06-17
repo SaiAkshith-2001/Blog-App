@@ -1,7 +1,6 @@
 import { Box, Typography, Stack, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import logo from "../assests/images/logo512.png";
-// import { lazy } from "react";
 
 const Footer = () => {
   return (

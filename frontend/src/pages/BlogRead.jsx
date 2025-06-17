@@ -52,27 +52,6 @@ const BlogRead = () => {
     // eslint-disable-next-line
   }, [skip, limit]);
 
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     // console.log(window.innerHeight);
-  //     // console.log(document.documentElement.scrollTop);
-  //     // console.log(document.documentElement.scrollHeight);
-  //     try {
-  //       if (
-  //         window.innerHeight + document.documentElement.scrollTop + 1 >=
-  //         document.documentElement.scrollHeight
-  //       ) {
-  //         setIsLoading(true);
-  //       }
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  //   //eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
   };

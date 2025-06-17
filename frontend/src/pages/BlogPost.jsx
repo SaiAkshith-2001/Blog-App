@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, useContext } from "react";
+import { useState, useEffect, lazy, useContext } from "react";
 import {
   Container,
   Typography,
@@ -158,7 +158,7 @@ const BlogPost = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <React.Fragment>
+        <>
           <Stack sx={{ mx: "2rem" }} spacing={2}>
             <Breadcrumbs
               separator={<NavigateNext fontSize="small" />}
@@ -395,7 +395,7 @@ const BlogPost = () => {
           />
           <Box sx={{ p: 2 }}>
             {postDetails?.body?.interactions?.comments?.map((i, index) => (
-              <React.Fragment>
+              <>
                 <Box
                   key={index}
                   sx={{ display: "flex", gap: 1, alignItems: "center" }}
@@ -409,10 +409,10 @@ const BlogPost = () => {
                     {format(i?.createdAt, "MMM dd, y")}
                   </Typography>
                 </Box>
-              </React.Fragment>
+              </>
             ))}
           </Box>
-        </React.Fragment>
+        </>
       )}
     </Container>
   );

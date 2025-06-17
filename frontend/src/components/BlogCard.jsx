@@ -1,4 +1,4 @@
-import React, { lazy, useState } from "react";
+import { lazy, useState } from "react";
 import {
   Typography,
   IconButton,
@@ -20,8 +20,8 @@ import { format } from "date-fns";
 // import DOMPurify from "dompurify";
 
 const MoreVertIcon = lazy(() => import("@mui/icons-material/MoreVert"));
-const DeleteIcon = lazy(() => import("@mui/icons-material/Delete"));
-const EditIcon = lazy(() => import("@mui/icons-material/Edit"));
+// const DeleteIcon = lazy(() => import("@mui/icons-material/Delete"));
+// const EditIcon = lazy(() => import("@mui/icons-material/Edit"));
 const ShareIcon = lazy(() => import("@mui/icons-material/Share"));
 const FlagIcon = lazy(() => import("@mui/icons-material/Flag"));
 const PushPin = lazy(() => import("@mui/icons-material/PushPin"));
