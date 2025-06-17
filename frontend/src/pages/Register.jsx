@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import {
   Container,
   TextField,
@@ -72,7 +72,6 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     try {
-      //eslint-disable-next-line
       const response = await axios.post(`${url}/api/user/register`, {
         email: data.email,
         username: data.username,
@@ -82,27 +81,15 @@ const Register = () => {
       redirectToLogin();
       setSnackbar({
         open: true,
-        message: "User registered Successfully!",
+        message: response.data.message,
         severity: "success",
       });
     } catch (error) {
       console.error("Login failed", error);
-      if (error.response && error.response.status === 401) {
+      if (error.response) {
         setSnackbar({
           open: true,
-          message: "Invalid username (or) password , Please verify!",
-          severity: "error",
-        });
-      } else if (error.response && error.response.status === 404) {
-        setSnackbar({
-          open: true,
-          message: "User does not exists!",
-          severity: "error",
-        });
-      } else if (error.response && error.response.status === 429) {
-        setSnackbar({
-          open: true,
-          message: "Too many requests, please try again later.",
+          message: error.response.data.message,
           severity: "error",
         });
       } else {

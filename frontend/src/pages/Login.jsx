@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import * as Yup from "yup";
@@ -73,33 +73,21 @@ const Login = () => {
         username: data.username,
         password: data.password,
       });
-      login(response.data.refreshToken);
+      login(response.data.token);
       if (response.data && response.status === 200) {
         setSnackbar({
           open: true,
-          message: "Login successfully",
+          message: response.data.message,
           severity: "success",
         });
       }
-      navigate("/write");
+      navigate("/read");
     } catch (error) {
       console.error("Login failed", error);
       if (error.response && error.response.status === 401) {
         setSnackbar({
           open: true,
-          message: "Invalid username (or) password , Please verify!",
-          severity: "error",
-        });
-      } else if (error.response && error.response.status === 404) {
-        setSnackbar({
-          open: true,
-          message: "User does not exists!",
-          severity: "error",
-        });
-      } else if (error.response && error.response.status === 429) {
-        setSnackbar({
-          open: true,
-          message: "Too many requests, please try again later.",
+          message: error.response.data.message,
           severity: "error",
         });
       } else {
