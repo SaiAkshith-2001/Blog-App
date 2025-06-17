@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 import { AppRoutes } from "./routes";
 import AppNavBar from "./components/AppNavBar";
+// import Footer from "./components/Footer";
 function App() {
   return (
     <BrowserRouter>
@@ -23,6 +24,7 @@ function App() {
       >
         <AppRoutes />
       </Suspense>
+      {/* <Footer /> */}
     </BrowserRouter>
   );
 }

@@ -15,8 +15,9 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
-import { convertDate, stringAvatar } from "../utils";
-import DOMPurify from "dompurify";
+import { stringAvatar } from "../utils";
+import { format } from "date-fns";
+// import DOMPurify from "dompurify";
 
 const MoreVertIcon = lazy(() => import("@mui/icons-material/MoreVert"));
 const DeleteIcon = lazy(() => import("@mui/icons-material/Delete"));
@@ -42,7 +43,7 @@ const StyledCardContent = styled(CardContent)({
   flexGrow: 1,
 });
 
-const BlogCard = ({ post, onEdit, onDelete }) => {
+const BlogCard = ({ post }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
   const handleMoreOptions = (event) => {
@@ -66,9 +67,9 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
     return content;
   };
 
-  const sanitizedContent = DOMPurify.sanitize(post?.body?.content, {
-    USE_PROFILES: { html: true },
-  });
+  // const sanitizedContent = DOMPurify.sanitize(post?.body?.content, {
+  //   USE_PROFILES: { html: true },
+  // });
 
   const extractCoverFromPost = (content) => {
     const parser = new DOMParser();
@@ -80,13 +81,14 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
   return (
     <StyledCard variant="outlined" onClick={handleCardClick}>
       <CardHeader
-        avatar={<Avatar {...stringAvatar(post.author?.name)} />}
+        avatar={
+          <Avatar src={post?.avatar} {...stringAvatar(post.author?.name)} />
+        }
         action={
           <>
             <IconButton color="inherit" onClick={handleMoreOptions}>
               <MoreVertIcon />
             </IconButton>
-
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
@@ -99,7 +101,7 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
                 </ListItemIcon>
                 Pin
               </MenuItem>
-              <MenuItem
+              {/* <MenuItem
                 onClick={(e) => {
                   e.stopPropagation();
                   onEdit(post);
@@ -120,7 +122,7 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
                   <DeleteIcon />
                 </ListItemIcon>
                 Delete
-              </MenuItem>
+              </MenuItem> */}
               <MenuItem>
                 <ListItemIcon>
                   <ShareIcon />
@@ -137,14 +139,16 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
           </>
         }
         title={post.author?.name}
-        subheader={convertDate(post?.createdAt)}
+        subheader={format(post?.createdAt, "MMM dd, y")}
       />
-      <CardMedia
-        component="img"
-        height="200"
-        image={extractCoverFromPost(post?.body?.content)}
-        alt={post?.title}
-      />
+      {extractCoverFromPost(post?.body?.content) && (
+        <CardMedia
+          component="img"
+          height="200"
+          image={extractCoverFromPost(post?.body?.content)}
+          alt={post?.title}
+        />
+      )}
       <StyledCardContent>
         <Typography
           gutterBottom
@@ -154,14 +158,14 @@ const BlogCard = ({ post, onEdit, onDelete }) => {
         >
           {renderContent(post?.title, 10)}
         </Typography>
-        <Typography
+        {/* <Typography
           variant="body2"
           color="text.secondary"
           sx={{ mt: 1 }}
           dangerouslySetInnerHTML={{
             __html: renderContent(sanitizedContent, 5),
           }}
-        />
+        /> */}
         <Stack
           sx={{
             display: "flex",

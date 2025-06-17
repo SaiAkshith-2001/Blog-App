@@ -11,9 +11,22 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
-.customEditor .ql-container {
-  height: 75% !important;
+.ql-toolbar {
+  border: none !important;
 }
+.ql-container {
+  border: none !important;
+}
+.customEditor .ql-editor {
+  font-size: 1.2rem !important;
+  padding: 0 !important;
+}
+.ql-bubble .ql-editor.ql-blank::before {
+  color: inherit;
+}
+/* .customEditor .ql-container {
+  height: 75% !important;
+} */
 
 .quill-content img {
   max-width: 100%;

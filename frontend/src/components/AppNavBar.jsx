@@ -1,4 +1,4 @@
-import React, { lazy, useContext, useState } from "react";
+import { lazy, useContext, useState } from "react";
 import {
   AppBar,
   Box,
@@ -27,7 +27,9 @@ import { Link } from "react-router-dom";
 const ThemeToggleButton = lazy(() => import("../components/ToggleButton"));
 const MenuIcon = lazy(() => import("@mui/icons-material/Menu"));
 const LogoutIcon = lazy(() => import("@mui/icons-material/Logout"));
-
+const PersonRoundedIcon = lazy(() =>
+  import("@mui/icons-material/PersonRounded")
+);
 const AppNavBar = ({ window, theme }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -163,7 +165,7 @@ const AppNavBar = ({ window, theme }) => {
           {user ? (
             <Tooltip title="Profile" arrow>
               <IconButton color="inherit" onClick={handleMenuOpen}>
-                <Avatar alt={user?.name} src={user?.picture ?? user.name} />
+                <Avatar alt={user?.name} src={user?.picture ?? user?.name} />
               </IconButton>
             </Tooltip>
           ) : (
@@ -190,31 +192,47 @@ const AppNavBar = ({ window, theme }) => {
               horizontal: "right",
             }}
           >
-            {!user ? (
-              [
-                <MenuItem
-                  component={Link}
-                  to="/login"
-                  onClick={() => handleMenuClose()}
-                >
-                  Login
-                </MenuItem>,
-                <MenuItem
-                  component={Link}
-                  to="/register"
-                  onClick={() => handleMenuClose()}
-                >
-                  Register
-                </MenuItem>,
-              ]
-            ) : (
-              <MenuItem component={Link} to="/" onClick={() => handleLogout()}>
-                <ListItemIcon sx={{ color: "red" }}>
-                  <LogoutIcon />
-                </ListItemIcon>
-                Logout
-              </MenuItem>
-            )}
+            {!user
+              ? [
+                  <MenuItem
+                    component={Link}
+                    to="/login"
+                    onClick={() => handleMenuClose()}
+                  >
+                    Login
+                  </MenuItem>,
+                  <MenuItem
+                    component={Link}
+                    to="/register"
+                    onClick={() => handleMenuClose()}
+                  >
+                    Register
+                  </MenuItem>,
+                ]
+              : [
+                  <MenuItem
+                    component={Link}
+                    to={`/profile/${
+                      user?.username || user?.email.split("@")[0]
+                    }`}
+                    onClick={() => handleMenuClose()}
+                  >
+                    <ListItemIcon>
+                      <PersonRoundedIcon />
+                    </ListItemIcon>
+                    Profile
+                  </MenuItem>,
+                  <MenuItem
+                    component={Link}
+                    to="/"
+                    onClick={() => handleLogout()}
+                  >
+                    <ListItemIcon sx={{ color: "red" }}>
+                      <LogoutIcon />
+                    </ListItemIcon>
+                    Logout
+                  </MenuItem>,
+                ]}
           </Menu>
           <ThemeToggleButton />
         </Toolbar>
