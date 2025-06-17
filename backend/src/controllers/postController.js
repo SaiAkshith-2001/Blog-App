@@ -31,7 +31,7 @@ export const readAllPosts = async (req, res) => {
 export const readPostById = async (req, res) => {
   try {
     const id = req.params.id;
-    const post = await Post.findOne({
+    const post = await Post.findById({
       _id: id,
     });
     res.json({
