@@ -17,7 +17,7 @@ export const authMiddleware = async (req, res, next) => {
     if (decodedToken.iss && decodedToken.iss.includes("google")) {
       verifyGoogleOAuthToken(req, res, next);
     } else {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
       const user = await User.findById(decoded.userId).select("-password");
       if (!user) {
         return res.status(401).json({
@@ -70,48 +70,4 @@ export const authMiddleware = async (req, res, next) => {
 //         }
 //         next();
 //       };
-//     }),
-//     (generateToken = (user) => {
-//       return jwt.sign(
-//         {
-//           id: user._id,
-//           username: user.username,
-//           // email: user.email,
-//           role: user.role,
-//         },
-//         process.env.JWT_SECRET,
-//         {
-//           expiresIn: "10m",
-//         }
-//       );
-//     }),
-//     (generateRefreshToken = (user) => {
-//       return jwt.sign(
-//         {
-//           id: user._id,
-//         },
-//         process.env.JWT_REFRESH_SECRET,
-//         {
-//           expiresIn: "7d",
-//         }
-//       );
-//     }),
-//     // Verify Refresh Token
-//     (verifyRefreshToken = async (refreshToken) => {
-//       try {
-//         // Verify the refresh token
-//         const decoded = jwt.verify(
-//           refreshToken,
-//           process.env.JWT_REFRESH_SECRET
-//         );
-//         // Find user
-//         const user = await User.findById(decoded.id);
-//         if (!user) {
-//           throw new Error("User not found");
-//         }
-//         return user;
-//       } catch (error) {
-//         throw error;
-//       }
-//     });
-// };
+//     })

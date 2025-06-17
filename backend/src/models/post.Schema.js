@@ -1,7 +1,14 @@
 import mongoose from "mongoose";
 const postSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true, trim: true,index:true },
+    // creatorId: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "User",
+    //     index: true,
+    //   },
+    // ],
+    title: { type: String, required: true, trim: true, index: true },
     author: {
       name: { type: String, required: true, trim: true },
       email: { type: String, required: true, trim: true },
@@ -18,18 +25,15 @@ const postSchema = new mongoose.Schema(
         comments: [
           {
             count: { type: Number, default: 0 },
-            avatar: { type: String, default: null },
+            profilePicture: { type: String, default: null },
             username: {
               type: String,
             },
             content: {
               type: String,
             },
-            createdAt: {
-              type: Date,
-              default: Date.now,
-            },
           },
+          { timestamps: true },
         ],
         shares: {
           type: Number,

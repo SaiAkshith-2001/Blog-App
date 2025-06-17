@@ -1,7 +1,7 @@
 import { User } from "../models/user.Schema.js";
 import bcrypt from "bcryptjs";
 import { validationResult } from "express-validator";
-import { generateToken } from "../config/generateToken.js";
+import { generateAccessToken } from "../config/generateToken.js";
 export const register = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -35,7 +35,7 @@ export const register = async (req, res) => {
         email: newUser.email,
         role: newUser.role,
       },
-      refreshToken: generateToken(newUser._id),
+      token: generateAccessToken(newUser._id, newUser.username, newUser.email),
     });
   } catch (error) {
     console.error("Registration error:", error);
@@ -57,7 +57,7 @@ export const login = async (req, res) => {
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(401).json({
-        message: "Invalid credentials",
+        message: "Username is not registered",
       });
     }
     if (!user.isActive) {
@@ -79,7 +79,7 @@ export const login = async (req, res) => {
         email: user.email,
         role: user.role,
       },
-      refreshToken: generateToken(user._id),
+      token: generateAccessToken(user._id, user.username, user.email),
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -133,15 +133,17 @@ export const deleteUserById = async (req, res) => {
 
 export const getUserProfileById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select(
-      "-password -refreshToken"
-    );
+    const id = req.params.id;
+    const user = await User.findOne({ username: id }).select("-password");
     if (!user) {
       return res.status(404).json({
         message: "User not found",
       });
     }
-    res.json({ data: user });
+    res.json({
+      status: "success",
+      data: user,
+    });
   } catch (error) {
     console.error("Profile fetch error:", error);
     res.status(500).json({
@@ -150,64 +152,3 @@ export const getUserProfileById = async (req, res) => {
     });
   }
 };
-
-// const refreshToken = async (req, res) => {
-//   try {
-//     const { refreshToken } = req.body;
-//     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-//     const user = await User.findById(decoded.id);
-//     if (!user) {
-//       return res.status(401).json({
-//         message: "User not found",
-//       });
-//     }
-//     if (user.refreshToken !== refreshToken) {
-//       return res.status(401).json({
-//         message: "Invalid refresh token",
-//       });
-//     }
-//     const newAccessToken = jwt.sign(
-//       {
-//         id: user._id,
-//         username: user.username,
-//         email: user.email,
-//         role: user.role,
-//       },
-//       process.env.JWT_SECRET,
-//       { expiresIn: "10m" }
-//     );
-//     res.json({
-//       accessToken: newAccessToken,
-//     });
-//   } catch (error) {
-//     if (error.name === "JsonWebTokenError") {
-//       return res.status(401).json({
-//         message: "Invalid refresh token",
-//       });
-//     }
-//     res.status(500).json({
-//       message: "Server error during token refresh",
-//       error: error.message,
-//     });
-//   }
-// };
-// const logout = async (req, res) => {
-//   try {
-//     // Find user and clear refresh token
-//     const user = await User.findById(req.user.id);
-//     if (user) {
-//       user.refreshToken = null;
-//       await user.save();
-//     }
-//     // Clear client-side tokens would be handled by frontend
-//     res.json({
-//       message: "Logout successful",
-//     });
-//   } catch (error) {
-//     console.error("Logout error:", error);
-//     res.status(500).json({
-//       message: "Server error during logout",
-//       error: error.message,
-//     });
-//   }
-// };

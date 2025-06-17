@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema(
       minlength: 8,
     },
     googleId: { type: String, unique: true, sparse: true },
-    authType: { type: String, enum: ["local", "google"], required: true },
+    authType: { type: String, enum: ["local", "google"] },
     profilePicture: { type: String },
     role: {
       type: String,
@@ -41,6 +41,7 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true, collection: "users" }
 );
+
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   try {
@@ -52,14 +53,5 @@ userSchema.pre("save", async function (next) {
     return next(error);
   }
 });
-// // our own custom document instance methods to check password validity
-// userSchema.methods.isValidPassword = async function (candidatePassword) {
-//   return await bcrypt.compare(candidatePassword, this.password);
-// };
-
-// // Static method to find by username or using any email id
-// userSchema.statics.findByUsername = function (username) {
-//   return this.findOne({ username: username });
-// };
 
 export const User = mongoose.model("User", userSchema);

@@ -1,7 +1,5 @@
 import { OAuth2Client } from "google-auth-library";
 import { User } from "../models/user.Schema.js";
-import dotenv from "dotenv";
-dotenv.config();
 
 export const verifyGoogleOAuthToken = async (req, res, next) => {
   try {
@@ -24,7 +22,9 @@ export const verifyGoogleOAuthToken = async (req, res, next) => {
       user = new User({
         googleId: sub,
         email,
-        username: name || email.split("@")[0],
+        username: email?.split("@")[0],
+        name,
+        // username: name.split(" ").join("") || email.split("@")[0],
         profilePicture: picture,
         authType: "google",
       });
