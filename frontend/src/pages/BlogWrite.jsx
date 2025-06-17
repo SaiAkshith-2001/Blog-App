@@ -1,7 +1,6 @@
-import React, { useState, useEffect, lazy, useContext } from "react";
+import { useState, useEffect, lazy, useContext } from "react";
 import {
   Container,
-  Grid,
   Button,
   Dialog,
   DialogTitle,
@@ -14,38 +13,29 @@ import {
   Select,
   FormHelperText,
   Chip,
-  Typography,
   InputLabel,
   TextField,
 } from "@mui/material";
 import { SnackbarContext } from "../context/SnackbarContext";
+import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import BlogCard from "../components/BlogCard";
-import "react-quill/dist/quill.snow.css";
+import "react-quill/dist/quill.bubble.css";
 import "../index.css";
+import ConfirmationBox from "../components/ConfirmationBox";
 const ReactQuill = lazy(() => import("react-quill"));
 
 const modules = {
   toolbar: [
-    ["bold", "italic", "underline", "strike"],
+    [{ header: [1, 2, 3, false] }],
+    ["bold", "italic", "underline"],
     ["blockquote", "code-block"],
-    ["link", "image", "video", "formula"],
-    [{ header: 1 }, { header: 2 }],
-    [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
-    [{ script: "sub" }, { script: "super" }], // superscript/subscript
-    [{ indent: "-2" }, { indent: "+2" }],
-    // [{ direction: "rtl" }], // text direction
-    [{ size: ["small", false, "large", "huge"] }], // custom dropdown
-    [{ header: [1, 2, 3, 4, 5, 6, false] }],
-    [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-    [{ font: [] }],
-    [{ align: [] }],
-    ["image"],
-    ["clean"], // remove formatting button
+    ["link", "image", "video"],
   ],
 };
+
 const BlogWrite = () => {
   const { setSnackbar } = useContext(SnackbarContext);
+  const { user } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
   const [chips, setChips] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -57,41 +47,24 @@ const BlogWrite = () => {
     author: { name: "", email: "" },
     body: { category: "", content: "", tags: [] },
   });
-  const [error, setError] = useState(false);
-  const [helperText, setHelperText] = useState("");
   const [newPost, setNewPost] = useState({
     title: "",
     author: { name: "", email: "" },
     body: { category: "", content: "", tags: [] },
   });
+  const [error, setError] = useState(false);
+  const [helperText, setHelperText] = useState("");
   const [deletePost, setDeletePost] = useState(null);
   const url = process.env.REACT_APP_API_URL;
 
   const fetchPosts = async () => {
     setIsLoading(true);
-    // try {
-    //   const response = await fetch(
-    //     `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=10`
-    //   );
-    //   const data = await response.json();
-    //   //console.log(data);
-    //   if (!response.ok) {
-    //     throw new Error("please try again!");
-    //   } else {
-    //     setIsLoading(false);
-    //     setPosts((prevData) => [...prevData, ...data]);
-    //   }
-    // } catch (err) {
-    //   setIsLoading(false);
-    //   console.error("Error in fetching data, Please try again later!", err);
-    // }
     const token = JSON.parse(localStorage.getItem("tokens"));
     try {
       const response = await axios.get(`${url}/api/posts/write`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = response.data.posts;
-      // console.log(data);
       setIsLoading(false);
       setPosts([...data]);
     } catch (error) {
@@ -128,6 +101,7 @@ const BlogWrite = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const handleCreatePost = async () => {
     const token = JSON.parse(localStorage.getItem("tokens"));
     try {
@@ -137,7 +111,10 @@ const BlogWrite = () => {
         `${url}/api/posts/write`,
         {
           title: newPost.title,
-          author: { name: newPost.author.name, email: newPost.author.email },
+          author: {
+            name: user?.given_name ?? user?.username,
+            email: user?.email,
+          },
           body: {
             tags: chips,
             category: newPost.body.category,
@@ -150,7 +127,6 @@ const BlogWrite = () => {
           },
         }
       );
-      //console.log(response.data);
       const post = { ...newPost, id: Date.now() };
       setIsLoading(false);
       setPosts((prev) => [post, ...prev]);
@@ -194,10 +170,12 @@ const BlogWrite = () => {
       }
     }
   };
+  // eslint-disable-next-line
   const handleDeleteDialog = (post) => {
     setDeletePost(post);
     setDeleteDialogOpen(true);
   };
+
   const handlePostDelete = async () => {
     const token = JSON.parse(localStorage.getItem("tokens"));
     setIsLoading(true);
@@ -237,17 +215,15 @@ const BlogWrite = () => {
       setDeletePost(null);
     }
   };
-  const handlePostEdit = (post) => {
-    setEditingPost(post);
-    setDialogOpen(true);
-  };
+
+  // const handlePostEdit = (post) => {
+  //   setEditingPost(post);
+  //   setDialogOpen(true);
+  // };
+
   const handleUpdatePost = async () => {
     const token = JSON.parse(localStorage.getItem("tokens"));
-    if (
-      !editingPost?.title?.trim() ||
-      !editingPost?.body?.content?.trim() ||
-      !editingPost?.author?.name?.trim()
-    ) {
+    if (!editingPost?.title?.trim() || !editingPost?.body?.content?.trim()) {
       setError(true);
       setHelperText("This is required field");
       setSnackbar({
@@ -279,7 +255,6 @@ const BlogWrite = () => {
           },
         }
       );
-      // console.log(response.data);
       if (response.status === 204) {
         setPosts((prev) =>
           prev.map((post) =>
@@ -374,6 +349,20 @@ const BlogWrite = () => {
         }}
         maxWidth="md"
       >
+        <Box sx={{ my: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCreatePost}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Create Post"
+            )}
+          </Button>
+        </Box>
         <TextField
           fullWidth
           required
@@ -385,8 +374,9 @@ const BlogWrite = () => {
           margin="normal"
           error={newPost.title.trim() === "" ? error : null}
           helperText={newPost.title.trim() === "" ? helperText : null}
+          sx={{ outline: "none", fontWeight: "1.5rem" }}
         />
-        <TextField
+        {/* <TextField
           fullWidth
           required
           placeholder="Author Name"
@@ -407,7 +397,7 @@ const BlogWrite = () => {
           margin="normal"
           error={newPost.author.email.trim() === "" ? error : null}
           helperText={newPost.author.email.trim() === "" ? helperText : null}
-        />
+        /> */}
         <Box
           sx={{
             py: 2,
@@ -478,32 +468,14 @@ const BlogWrite = () => {
           </Box>
         </Box>
         <ReactQuill
-          theme="snow"
+          theme="bubble"
           modules={modules}
-          required
           value={newPost.body.content}
           onChange={handleContentChange}
           placeholder="Write your post content here..."
-          style={{
-            height: "300px",
-          }}
           className="customEditor"
         />
-        <Box sx={{ my: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCreatePost}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              "Create Post"
-            )}
-          </Button>
-        </Box>
-        {isLoading ? (
+        {/* {isLoading ? (
           <Box sx={{ display: "flex", justifyContent: "center" }}>
             <CircularProgress />
           </Box>
@@ -520,47 +492,18 @@ const BlogWrite = () => {
                 </Grid>
               ))}
           </Grid>
-        )}
+        )} */}
       </Container>
-      <Dialog
+      <ConfirmationBox
+        title="Confirm Delete"
+        message="Are you sure you want to delete this post? Deletion is not reversible,
+                and the post will be completely deleted."
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-      >
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete this post? Deletion is not
-            reversible, and the post will be completely deleted.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setDeleteDialogOpen(false)}
-            color="primary"
-            variant="contained"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handlePostDelete}
-            color="error"
-            variant="outlined"
-            disabled={isLoading}
-            sx={{
-              "&:hover": {
-                color: "white",
-                backgroundColor: "red",
-              },
-            }}
-          >
-            {isLoading ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              "Delete"
-            )}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        isLoading={isLoading}
+        onConfirm={handlePostDelete}
+        ConfirmButton="Delete"
+      />
       <Dialog
         fullWidth
         maxWidth="md"
@@ -582,7 +525,7 @@ const BlogWrite = () => {
             error={editingPost?.title === "" ? error : null}
             helperText={editingPost?.title === "" ? helperText : null}
           />
-          <TextField
+          {/* <TextField
             placeholder="Author"
             value={editingPost?.author.name}
             onChange={(e) =>
@@ -596,8 +539,8 @@ const BlogWrite = () => {
             required
             error={editingPost?.author.name === "" ? error : null}
             helperText={editingPost?.author.name === "" ? helperText : null}
-          />
-          {/* <TextField
+          /> 
+          <TextField
             fullWidth
             required
             value={editingPost?.body.tags}
@@ -636,12 +579,14 @@ const BlogWrite = () => {
             ))}
           </Box> */}
           <ReactQuill
-            theme="snow"
-            required
+            theme="bubble"
+            modules={modules}
             value={editingPost?.body.content || ""}
-            style={{
-              height: "300px",
-            }}
+            // required
+            // style={{
+            //   border: "none",
+            //   // height: "300px",
+            // }}
             className="customEditor"
             onChange={(content) =>
               setEditingPost((prev) => ({

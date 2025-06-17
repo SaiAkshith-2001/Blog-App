@@ -14,10 +14,11 @@ import {
   Menu,
   MenuItem,
   ListItemIcon,
+  Breadcrumbs,
 } from "@mui/material";
 import axios from "axios";
-import { convertDate } from "../utils";
-import { useParams, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import DOMPurify from "dompurify";
 import "../index.css";
 import {
@@ -34,6 +35,9 @@ const MoreVertIcon = lazy(() => import("@mui/icons-material/MoreVert"));
 const FavoriteIcon = lazy(() => import("@mui/icons-material/Favorite"));
 const SendRoundedIcon = lazy(() => import("@mui/icons-material/SendRounded"));
 const CommentIcon = lazy(() => import("@mui/icons-material/Comment"));
+const AccessTimeIcon = lazy(() => import("@mui/icons-material/AccessTime"));
+const NavigateNext = lazy(() => import("@mui/icons-material/NavigateNext"));
+
 const BlogPost = () => {
   const { id } = useParams();
   const [postDetails, setPostDetails] = useState({});
@@ -78,7 +82,7 @@ const BlogPost = () => {
       if (error.response && error.response.status === 401) {
         setSnackbar({
           open: true,
-          message: "Invalid username (or) password , Please verify!",
+          message: error.response.data.message,
           severity: "error",
         });
       }
@@ -87,7 +91,7 @@ const BlogPost = () => {
   useEffect(() => {
     getPostDetails();
     // eslint-disable-next-line
-  }, []);
+  }, [id]);
   //   const handleScroll = useCallback(() => {
   //     // console.log(window.innerHeight);
   //     // console.log(document.documentElement.scrollTop);
@@ -117,6 +121,36 @@ const BlogPost = () => {
     //   ], // Allow only these tags
     //   ALLOWED_ATTR: ["href", "class", "src", "spellcheck"], // Allow only these attributes
   });
+  // function handleClick(event) {
+  //   event.preventDefault();
+  // }
+  const calculateReadingTime = (content) => {
+    const wordsPerMinute = 200;
+    const words = content?.trim().split(/\s+/).length;
+    const time = Math.ceil(words / wordsPerMinute);
+    return time;
+  };
+  const breadcrumbs = [
+    <Typography
+      sx={{ cursor: "pointer" }}
+      component={Link}
+      key="1"
+      color="inherit"
+      to="/"
+      // onClick={handleClick}
+    >
+      Home
+    </Typography>,
+    <Typography
+      // component={Link}
+      key="2"
+      color="inherit"
+      // to={`/posts/${postDetails?._id}`}
+      // onClick={handleClick}
+    >
+      {postDetails?.title}
+    </Typography>,
+  ];
   return (
     <Container maxWidth="md" style={{ marginTop: "6rem" }}>
       {isLoading ? (
@@ -125,6 +159,15 @@ const BlogPost = () => {
         </Box>
       ) : (
         <React.Fragment>
+          <Stack sx={{ mx: "2rem" }} spacing={2}>
+            <Breadcrumbs
+              separator={<NavigateNext fontSize="small" />}
+              aria-label="breadcrumb"
+            >
+              {breadcrumbs}
+            </Breadcrumbs>
+          </Stack>
+          <Divider sx={{ marginTop: "0.5rem" }} />
           <Typography
             variant="h3"
             sx={{ fontWeight: "bold", lineHeight: 1.6 }}
@@ -132,20 +175,54 @@ const BlogPost = () => {
           >
             {postDetails?.title}
           </Typography>
-          <Typography
+          <Stack
+            direction="row"
+            spacing={2}
             sx={{
-              fontFamily: "Georgia, Times, 'Times New Roman', serif",
-              fontSize: "1.25rem",
-              lineHeight: 1.6,
-              py: 0.75,
+              display: "flex",
+              alignItems: "center",
+              gap: "2px",
+              fontSize: "1rem",
             }}
           >
-            {postDetails?.body?.category}
-          </Typography>
-          {/* <Typography variant="subtitle2">
-            {convertDate(postDetails?.createdAt)}
-          </Typography> */}
-          <Divider />
+            <Typography>
+              {postDetails?.createdAt
+                ? format(postDetails?.createdAt, "MMM dd, y")
+                : "loading..."}
+            </Typography>
+            <Typography
+              component="span"
+              sx={{
+                height: 4,
+                width: 4,
+                backgroundColor: "#000",
+                borderRadius: 2,
+                mx: 1,
+              }}
+            />
+            <Typography
+              sx={{ display: "flex", alignItems: "center", gap: "2px" }}
+            >
+              <AccessTimeIcon fontSize="small" />
+              {calculateReadingTime(sanitizedContent) <= 1
+                ? "1 mintue read"
+                : `${calculateReadingTime(sanitizedContent)} mintues read`}
+            </Typography>
+            <Typography
+              component="span"
+              sx={{
+                height: 4,
+                width: 4,
+                backgroundColor: "#000",
+                borderRadius: 2,
+                mx: 1,
+              }}
+            />
+            <Typography sx={{ fontWeight: "bold" }}>
+              {postDetails?.body?.category}
+            </Typography>
+          </Stack>
+          <Divider sx={{ marginTop: "0.5rem" }} />
           <Stack
             direction="row"
             spacing={2}
@@ -329,7 +406,7 @@ const BlogPost = () => {
                   </Typography>
                   <Typography key={i.id}>{i?.content}</Typography>
                   <Typography variant="subtitle2">
-                    {convertDate(i?.createdAt)}
+                    {format(i?.createdAt, "MMM dd, y")}
                   </Typography>
                 </Box>
               </React.Fragment>
