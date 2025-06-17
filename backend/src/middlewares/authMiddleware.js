@@ -49,25 +49,3 @@ export const authMiddleware = async (req, res, next) => {
     });
   }
 };
-
-// Role-based Authorization Middleware
-//     (authorizeRoles = (...allowedRoles) => {
-//       return (req, res, next) => {
-//         // Check if user exists and has a role
-//         if (!req.user || !req.user.role) {
-//           return res.status(403).json({
-//             message: "Access denied. User role not defined.",
-//           });
-//         }
-//         // Check if user's role is in the allowed roles
-//         const isAllowed = allowedRoles.includes(req.user.role);
-//         if (!isAllowed) {
-//           return res.status(403).json({
-//             message: `Access denied. Requires role: ${allowedRoles.join(
-//               " or "
-//             )}`,
-//           });
-//         }
-//         next();
-//       };
-//     })

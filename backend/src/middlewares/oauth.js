@@ -24,7 +24,6 @@ export const verifyGoogleOAuthToken = async (req, res, next) => {
         email,
         username: email?.split("@")[0],
         name,
-        // username: name.split(" ").join("") || email.split("@")[0],
         profilePicture: picture,
         authType: "google",
       });
