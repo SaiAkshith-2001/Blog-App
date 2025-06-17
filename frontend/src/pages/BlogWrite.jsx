@@ -21,6 +21,7 @@ import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import "react-quill/dist/quill.bubble.css";
 import "../index.css";
+import { useNavigate } from "react-router-dom";
 import ConfirmationBox from "../components/ConfirmationBox";
 const ReactQuill = lazy(() => import("react-quill"));
 
@@ -36,6 +37,7 @@ const modules = {
 const BlogWrite = () => {
   const { setSnackbar } = useContext(SnackbarContext);
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [chips, setChips] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -140,6 +142,7 @@ const BlogWrite = () => {
         author: { name: "", email: "" },
         body: { category: "", content: "", tags: [] },
       });
+      navigate("/read");
       setError(false);
       setChips([]);
       setInputValue("");

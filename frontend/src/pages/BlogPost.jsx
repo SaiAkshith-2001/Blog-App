@@ -92,38 +92,11 @@ const BlogPost = () => {
     getPostDetails();
     // eslint-disable-next-line
   }, [id]);
-  //   const handleScroll = useCallback(() => {
-  //     // console.log(window.innerHeight);
-  //     // console.log(document.documentElement.scrollTop);
-  //     // console.log(document.documentElement.scrollHeight);
-  //     if (
-  //       window.innerHeight + document.documentElement.scrollTop + 1 >=
-  //       document.documentElement.scrollHeight //
-  //     ) {
-  //       if (!isLoading) {
-  //         getNews();
-  //       }
-  //     }
-  //   }, [isLoading]);
-  //   useEffect(() => {
-  //     window.addEventListener("scroll", handleScroll);
-  //     return () => window.removeEventListener("scroll", handleScroll);
-  //   }, [isLoading]);
+
   const sanitizedContent = DOMPurify.sanitize(postDetails?.body?.content, {
     USE_PROFILES: { html: true },
-    //   ALLOWED_TAGS: [
-    //     "b",
-    //     "p",
-    //     "a",
-    //     "img",
-    //     "h1",
-    //     "h2",
-    //   ], // Allow only these tags
-    //   ALLOWED_ATTR: ["href", "class", "src", "spellcheck"], // Allow only these attributes
   });
-  // function handleClick(event) {
-  //   event.preventDefault();
-  // }
+
   const calculateReadingTime = (content) => {
     const wordsPerMinute = 200;
     const words = content?.trim().split(/\s+/).length;
@@ -137,20 +110,14 @@ const BlogPost = () => {
       key="1"
       color="inherit"
       to="/"
-      // onClick={handleClick}
     >
       Home
     </Typography>,
-    <Typography
-      // component={Link}
-      key="2"
-      color="inherit"
-      // to={`/posts/${postDetails?._id}`}
-      // onClick={handleClick}
-    >
+    <Typography key="2" color="inherit">
       {postDetails?.title}
     </Typography>,
   ];
+
   return (
     <Container maxWidth="md" style={{ marginTop: "6rem" }}>
       {isLoading ? (
