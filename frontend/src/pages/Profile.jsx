@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Card,
@@ -11,16 +10,16 @@ import {
 } from "@mui/material";
 import { SnackbarContext } from "../context/SnackbarContext";
 import { useContext } from "react";
+import userService from "../services/userService";
 
 const Profile = () => {
   const [userData, setUserData] = useState();
   const { setSnackbar } = useContext(SnackbarContext);
   const { id } = useParams();
   const navigate = useNavigate();
-  const url = process.env.REACT_APP_API_URL;
   const handleNavigateProfile = async () => {
     try {
-      const response = await axios.get(`${url}/api/user/profile/${id}`);
+      const response = await userService.getUserProfileById(id);
       setUserData(response.data.data);
     } catch (error) {
       console.error("Failed to load Profile", error);

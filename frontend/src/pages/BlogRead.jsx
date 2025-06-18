@@ -15,8 +15,8 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import { Link, useSearchParams } from "react-router-dom";
-import axios from "axios";
 import BlogCard from "../components/BlogCard";
+import postService from "../services/postService";
 
 const StyledFab = styled(Fab)(({ theme }) => ({
   position: "fixed",
@@ -28,7 +28,6 @@ const BlogRead = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [newsData, setNewsData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const url = process.env.REACT_APP_API_URL;
   const [searchParams] = useSearchParams();
   const skip = searchParams.get("skip") || 0;
   const limit = searchParams.get("limit") || 10;
@@ -36,9 +35,7 @@ const BlogRead = () => {
   const getPosts = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(
-        `${url}/api/posts/read?skip=${skip}&limit=${limit}`
-      );
+      const response = await postService.getAllPosts(skip, limit);
       const data = response.data.posts;
       setIsLoading(false);
       setNewsData((prevData) => [...prevData, ...data]);

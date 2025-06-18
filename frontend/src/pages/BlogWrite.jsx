@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, useContext } from "react";
+import { useState, lazy, useContext } from "react";
 import {
   Container,
   Button,
@@ -18,11 +18,11 @@ import {
 } from "@mui/material";
 import { SnackbarContext } from "../context/SnackbarContext";
 import { AuthContext } from "../context/AuthContext";
-import axios from "axios";
 import "react-quill/dist/quill.bubble.css";
 import "../index.css";
 import { useNavigate } from "react-router-dom";
 import ConfirmationBox from "../components/ConfirmationBox";
+import postService from "../services/postService";
 const ReactQuill = lazy(() => import("react-quill"));
 
 const modules = {
@@ -57,78 +57,69 @@ const BlogWrite = () => {
   const [error, setError] = useState(false);
   const [helperText, setHelperText] = useState("");
   const [deletePost, setDeletePost] = useState(null);
-  const url = process.env.REACT_APP_API_URL;
 
-  const fetchPosts = async () => {
-    setIsLoading(true);
-    const token = JSON.parse(localStorage.getItem("tokens"));
-    try {
-      const response = await axios.get(`${url}/api/posts/write`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = response.data.posts;
-      setIsLoading(false);
-      setPosts([...data]);
-    } catch (error) {
-      setIsLoading(false);
-      console.error("Error in fetching data, Please try again later!", error);
-      setSnackbar({
-        open: true,
-        message: "Something went wrong Please try again later!",
-        severity: "error",
-      });
-    }
-  };
-  useEffect(() => {
-    fetchPosts();
-    return () => {
-      // Reset all state
-      setNewPost({
-        title: "",
-        author: { name: "", email: "" },
-        body: { category: "", content: "", tags: [] },
-      });
-      setEditingPost({
-        title: "",
-        author: { name: "", email: "" },
-        body: { category: "", content: "", tags: [] },
-      });
-      setChips([]);
-      setInputValue("");
-      setError(false);
-      setHelperText("");
-      // Close any open dialogs
-      setDialogOpen(false);
-      setDeleteDialogOpen(false);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // const fetchPosts = async () => {
+  //   setIsLoading(true);
+  //   const token = JSON.parse(localStorage.getItem("tokens"));
+  //   try {
+  //     const response = await axios.get(`${url}/api/posts/write`, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //     const data = response.data.posts;
+  //     setIsLoading(false);
+  //     setPosts([...data]);
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     console.error("Error in fetching data, Please try again later!", error);
+  //     setSnackbar({
+  //       open: true,
+  //       message: "Something went wrong Please try again later!",
+  //       severity: "error",
+  //     });
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchPosts();
+  //   return () => {
+  //     // Reset all state
+  //     setNewPost({
+  //       title: "",
+  //       author: { name: "", email: "" },
+  //       body: { category: "", content: "", tags: [] },
+  //     });
+  //     setEditingPost({
+  //       title: "",
+  //       author: { name: "", email: "" },
+  //       body: { category: "", content: "", tags: [] },
+  //     });
+  //     setChips([]);
+  //     setInputValue("");
+  //     setError(false);
+  //     setHelperText("");
+  //     // Close any open dialogs
+  //     setDialogOpen(false);
+  //     setDeleteDialogOpen(false);
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   const handleCreatePost = async () => {
-    const token = JSON.parse(localStorage.getItem("tokens"));
     try {
       setIsLoading(true);
-      //eslint-disable-next-line
-      const response = await axios.post(
-        `${url}/api/posts/write`,
-        {
-          title: newPost.title,
-          author: {
-            name: user?.given_name ?? user?.username,
-            email: user?.email,
-          },
-          body: {
-            tags: chips,
-            category: newPost.body.category,
-            content: newPost.body.content,
-          },
+      const reqPayload = {
+        title: newPost.title,
+        author: {
+          name: user?.given_name ?? user?.username,
+          email: user?.email,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+        body: {
+          tags: chips,
+          category: newPost.body.category,
+          content: newPost.body.content,
+        },
+      };
+      //eslint-disable-next-line
+      const response = await postService.createPost(reqPayload);
       const post = { ...newPost, id: Date.now() };
       setIsLoading(false);
       setPosts((prev) => [post, ...prev]);
@@ -180,17 +171,10 @@ const BlogWrite = () => {
   };
 
   const handlePostDelete = async () => {
-    const token = JSON.parse(localStorage.getItem("tokens"));
     setIsLoading(true);
     try {
-      const response = await axios.delete(
-        `${url}/api/posts/read/post/${deletePost._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await postService.deletePostById(deletePost._id);
+      // const response = await postService.deletePostById(`${deletePost._id}`);
       if (response.status === 204) {
         setPosts(posts.filter((post) => post._id !== deletePost._id));
         setIsLoading(false);
@@ -225,7 +209,7 @@ const BlogWrite = () => {
   // };
 
   const handleUpdatePost = async () => {
-    const token = JSON.parse(localStorage.getItem("tokens"));
+    // const token = JSON.parse(localStorage.getItem("tokens"));
     if (!editingPost?.title?.trim() || !editingPost?.body?.content?.trim()) {
       setError(true);
       setHelperText("This is required field");
@@ -238,26 +222,26 @@ const BlogWrite = () => {
     }
     try {
       setIsLoading(true);
-      const response = await axios.put(
-        `${url}/api/posts/read/post/${editingPost._id}`,
-        {
-          title: editingPost.title.trim(),
-          author: {
-            name: editingPost.author.name.trim(),
-            email: editingPost.author.email.trim(),
-          },
-          body: {
-            tags: editingPost.body.chips,
-            category: editingPost.body.category.trim(),
-            content: editingPost.body.content.trim(),
-          },
+      const reqPayload = {
+        title: editingPost.title.trim(),
+        author: {
+          name: editingPost.author.name.trim(),
+          email: editingPost.author.email.trim(),
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        body: {
+          tags: editingPost.body.chips,
+          category: editingPost.body.category.trim(),
+          content: editingPost.body.content.trim(),
+        },
+      };
+      const response = await postService.updatePostById(
+        editingPost._id,
+        reqPayload
       );
+      // const response = await postService.updatePostById(
+      //   `${editingPost._id}`,
+      //   reqPayload
+      // );
       if (response.status === 204) {
         setPosts((prev) =>
           prev.map((post) =>

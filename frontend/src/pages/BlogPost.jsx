@@ -16,7 +16,6 @@ import {
   ListItemIcon,
   Breadcrumbs,
 } from "@mui/material";
-import axios from "axios";
 import { format } from "date-fns";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import DOMPurify from "dompurify";
@@ -28,6 +27,7 @@ import {
   LinkedinIcon,
 } from "react-share";
 import { SnackbarContext } from "../context/SnackbarContext";
+import postService from "../services/postService";
 const ContentCopyRoundedIcon = lazy(() =>
   import("@mui/icons-material/ContentCopyRounded")
 );
@@ -47,7 +47,6 @@ const BlogPost = () => {
   const [isCopied, setIsCopied] = useState(false);
   const { setSnackbar } = useContext(SnackbarContext);
   const currentUrl = window.location.href;
-  const url = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
   const copyToClipboard = () => {
@@ -63,15 +62,10 @@ const BlogPost = () => {
   const handleMoreOptionsClose = () => {
     setAnchorEl(null);
   };
-  const getPostDetails = async () => {
+  const getPostFeeds = async () => {
     setIsLoading(true);
-    const token = JSON.parse(localStorage.getItem("tokens"));
     try {
-      const response = await axios.get(`${url}/api/posts/read/post/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await postService.getPostById(id);
       const data = response.data.post;
       setIsLoading(false);
       setPostDetails(data);
@@ -89,7 +83,7 @@ const BlogPost = () => {
     }
   };
   useEffect(() => {
-    getPostDetails();
+    getPostFeeds();
     // eslint-disable-next-line
   }, [id]);
 

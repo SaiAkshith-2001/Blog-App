@@ -1,6 +1,5 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import * as Yup from "yup";
 import {
   Button,
@@ -19,6 +18,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { AuthContext } from "../context/AuthContext";
 import { SnackbarContext } from "../context/SnackbarContext";
 import { GoogleLogin } from "@react-oauth/google";
+import userService from "../services/userService";
 
 const loginValidationSchema = Yup.object().shape({
   username: Yup.string()
@@ -41,7 +41,6 @@ const Login = () => {
   const { setSnackbar } = useContext(SnackbarContext);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const url = process.env.REACT_APP_API_URL;
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -69,10 +68,11 @@ const Login = () => {
   };
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(`${url}/api/user/login`, {
+      const reqPayload = {
         username: data.username,
         password: data.password,
-      });
+      };
+      const response = await userService.login(reqPayload);
       login(response.data.token);
       if (response.data && response.status === 200) {
         setSnackbar({

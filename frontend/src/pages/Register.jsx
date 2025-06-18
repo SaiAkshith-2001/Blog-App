@@ -15,12 +15,12 @@ import {
 } from "@mui/material";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SnackbarContext } from "../context/SnackbarContext";
+import userService from "../services/userService";
 
 const registrationValidationSchema = Yup.object({
   username: Yup.string()
@@ -48,7 +48,6 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
   const navigate = useNavigate();
-  const url = process.env.REACT_APP_API_URL;
 
   const handleRoleChange = (event) => {
     setSelectedRole(event.target.value);
@@ -72,12 +71,13 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(`${url}/api/user/register`, {
+      const reqPayload = {
         email: data.email,
         username: data.username,
         password: data.password,
         role: selectedRole,
-      });
+      };
+      const response = await userService.register(reqPayload);
       redirectToLogin();
       setSnackbar({
         open: true,
