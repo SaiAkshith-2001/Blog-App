@@ -3,10 +3,10 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
 import ThemeProvider from "../src/context/ThemeContext";
-import { Box, CircularProgress } from "@mui/material";
 import { AuthProvider } from "./context/AuthContext";
 import { SnackbarProvider } from "./context/SnackbarContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import CustomBackdrop from "./components/CustomBackdrop";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -18,20 +18,7 @@ root.render(
       <AuthProvider>
         <SnackbarProvider>
           <ThemeProvider>
-            <Suspense
-              fallback={
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    position: "relative",
-                  }}
-                >
-                  <CircularProgress />
-                </Box>
-              }
-            >
+            <Suspense fallback={<CustomBackdrop />}>
               <App />
             </Suspense>
           </ThemeProvider>
