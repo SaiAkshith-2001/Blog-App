@@ -24,9 +24,10 @@ code {
 .ql-bubble .ql-editor.ql-blank::before {
   color: inherit;
 }
-/* .customEditor .ql-container {
-  height: 75% !important;
-} */
+.customEditor .ql-container {
+  /* height: 75% !important; */
+  min-height: 100vh;
+}
 
 .quill-content img {
   max-width: 100%;

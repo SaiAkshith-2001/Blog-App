@@ -3,7 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AppRoutes } from "./routes";
 import AppNavBar from "./components/AppNavBar";
 import CustomBackdrop from "./components/CustomBackdrop";
-// import Footer from "./components/Footer";
+import Footer from "./components/Footer";
 function App() {
   return (
     <BrowserRouter>
@@ -11,7 +11,7 @@ function App() {
       <Suspense fallback={<CustomBackdrop />}>
         <AppRoutes />
       </Suspense>
-      {/* <Footer /> */}
+      <Footer />
     </BrowserRouter>
   );
 }
