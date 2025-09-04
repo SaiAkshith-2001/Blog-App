@@ -1,6 +1,7 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
-const userSchema = new mongoose.Schema(
+import { Role } from "./role.Schema.js";
+const userSchema = new Schema(
   {
     username: {
       type: String,
@@ -30,9 +31,12 @@ const userSchema = new mongoose.Schema(
     authType: { type: String, enum: ["local", "google"] },
     profilePicture: { type: String },
     role: {
-      type: String,
-      enum: ["User", "Admin", "Guest"],
-      default: "User",
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: Role,
+        },
+      ],
     },
     isActive: {
       type: Boolean,
@@ -54,4 +58,4 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-export const User = mongoose.model("User", userSchema);
+export const User = model("User", userSchema);
