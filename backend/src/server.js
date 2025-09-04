@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import app from "./index.js";
 import { port } from "./config/constants.js";
-import logger from "./core/logger.js";
+// import logger from "./core/logger.js";
 
 dotenv.config();
 app.listen(port, () => {

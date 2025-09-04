@@ -4,7 +4,7 @@ import { createLogger, transports, format } from "winston";
 import { env, logDirectory } from "../config/constants.js";
 import DailyRotateFile from "winston-daily-rotate-file";
 
-let dir = logDirectory.logDir ?? "logs";
+let dir = logDirectory.logDir ?? "./src/logs";
 
 if (!dir) dir = path.resolve("logs");
 
