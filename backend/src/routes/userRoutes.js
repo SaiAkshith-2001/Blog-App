@@ -1,14 +1,22 @@
 import express from "express";
 import { body } from "express-validator";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
+// import { authMiddleware } from "../middlewares/authMiddleware.js";
+import authentication from "../middlewares/authentication.js";
+import authorization from "../middlewares/authorization.js";
 import {
   login,
+  logout,
   register,
   updateUserById,
   deleteUserById,
   getUserProfileById,
+  refreshAccessToken,
 } from "../controllers/userController.js";
+import roles from "../helper/roles.js";
+import { Roles } from "../models/role.Schema.js";
+
 const router = express.Router();
+
 router.post(
   "/register",
   [
@@ -32,10 +40,12 @@ router.post(
   ],
   login
 );
+router.post("/logout", logout);
+router.post("/refresh-token", refreshAccessToken);
 router
   .route("/profile/:id")
-  .get(getUserProfileById)
-  .patch(authMiddleware, updateUserById)
-  .delete(authMiddleware, deleteUserById);
+  .get(authentication, getUserProfileById)
+  .patch(authentication, roles(Roles.user), authorization, updateUserById)
+  .delete(authentication, roles(Roles.user), authorization, deleteUserById);
 
 export default router;
