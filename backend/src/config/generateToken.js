@@ -58,31 +58,3 @@ export default {
   decodePayload,
   verifyToken,
 };
-
-// export const generateAccessToken = (userId, username, email) => {
-//   return jwt.sign(
-//     {
-//       userId,
-//       username,
-//       email,
-//     },
-//     tokenInfo.accessToken,
-//     {
-//       expiresIn: tokenInfo.accessTokenValidity,
-//     }
-//   );
-// };
-
-// export const generateRefreshToken = (userId, username, email) => {
-//   return jwt.sign(
-//     {
-//       userId,
-//       username,
-//       email,
-//     },
-//     tokenInfo.refreshToken,
-//     {
-//       expiresIn: tokenInfo.refreshTokenValidity,
-//     }
-//   );
-// };
