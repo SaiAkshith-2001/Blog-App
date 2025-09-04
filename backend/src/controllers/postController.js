@@ -1,13 +1,23 @@
+import {
+  saveAllPostsToCache,
+  getAllPostsFromCache,
+  savePostToCache,
+  getPostFromCache,
+  invalidatePostCache,
+} from "../cache/postsCache.js";
+import { cacheDuration } from "../config/constants.js";
 import { Post } from "../models/post.Schema.js";
+
 export const createPost = async (req, res) => {
   try {
     const newPost = await Post.create(req.body);
+    await invalidatePostCache("AllPosts");
     res.status(201).json({
       status: "success",
       data: { post: newPost },
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       status: "error",
       message: error.message,
     });
@@ -15,13 +25,27 @@ export const createPost = async (req, res) => {
 };
 export const readAllPosts = async (req, res) => {
   try {
-    const allPosts = await Post.find();
-    res.json({
+    let allPosts = await getAllPostsFromCache("AllPosts");
+    if (!allPosts) {
+      allPosts = await Post.find();
+      if (!allPosts || allPosts.length === 0) {
+        return res.status(404).json({
+          status: "error",
+          message: "No posts found",
+        });
+      }
+      await saveAllPostsToCache(
+        "AllPosts",
+        allPosts,
+        new Date(Date.now() + Number(cacheDuration.contentCacheDuration))
+      );
+    }
+    res.status(200).json({
       status: "success",
       posts: allPosts,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       status: "error",
       message: error.message,
     });
@@ -31,15 +55,29 @@ export const readAllPosts = async (req, res) => {
 export const readPostById = async (req, res) => {
   try {
     const id = req.params.id;
-    const post = await Post.findById({
-      _id: id,
-    });
+    let post = await getPostFromCache(id);
+    if (!post) {
+      post = await Post.findById({
+        _id: id,
+      });
+      if (!post) {
+        return res.status(404).json({
+          status: "error",
+          message: "No Post not found",
+        });
+      }
+      await savePostToCache(
+        id,
+        post,
+        new Date(Date.now() + Number(cacheDuration.contentCacheDuration))
+      );
+    }
     res.json({
       status: "success",
       post: post,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       status: "error",
       message: error.message,
     });
@@ -58,7 +96,7 @@ export const readPostByAuthor = async (req, res) => {
       post: post,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       status: "error",
       message: error.message,
     });
@@ -78,8 +116,6 @@ export const updatePostById = async (req, res) => {
       {
         $set: {
           title: req.body.title,
-          "author.email": req.body.author.email,
-          "author.name": req.body.author.name,
           "author.avatar": req.body.author.avatar,
           "body.tags": req.body.body.tags,
           "body.category": req.body.body.category,
@@ -103,7 +139,7 @@ export const updatePostById = async (req, res) => {
       post: updatedPost,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       status: "error",
       message: error.message,
     });
@@ -115,12 +151,12 @@ export const updatePostByIdPatch = async (req, res) => {
       runValidators: true,
       new: true,
     });
-    res.json({
+    res.status(200).json({
       status: "Post successfully updated",
       post: updatedPost,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       status: "error",
       message: error.message,
     });
@@ -128,18 +164,40 @@ export const updatePostByIdPatch = async (req, res) => {
 };
 export const deletePostById = async (req, res) => {
   try {
-    const result = await Post.findByIdAndDelete(req.params.id, {
-      runValidators: true,
-      new: true,
-    });
-    res.json({
-      status: "Post successfully deleted",
-      data: result,
+    const deletedPost = await Post.findByIdAndDelete(req.params.id);
+    if (!deletedPost)
+      return res.status(404).json({
+        status: "error",
+        message: "Post not found",
+      });
+    return res.status(200).json({
+      status: "success",
+      message: "Post successfully deleted",
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       status: "error",
       message: error.message,
     });
   }
 };
+
+// const configuration = new Configuration({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
+
+// const openai = new OpenAIApi(configuration);
+// app.post("/api/askai", async (req, res) => {
+//   try {
+//     const { prompt } = req.body;
+//     const response = await openai.createCompletion({
+//       model: "text-davinci-003",
+//       prompt,
+//       maxTokens: 150,
+//       // temperature: 0,
+//     });
+//     res.json({ message: response.data.choices[0].text });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
