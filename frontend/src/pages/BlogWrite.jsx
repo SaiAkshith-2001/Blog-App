@@ -328,11 +328,10 @@ const BlogWrite = () => {
   return (
     <>
       <Container
+        component="main"
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
           my: "6rem",
+          minHeight: "100vh",
         }}
         maxWidth="md"
       >
