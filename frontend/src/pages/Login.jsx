@@ -19,6 +19,7 @@ import { AuthContext } from "../context/AuthContext";
 import { SnackbarContext } from "../context/SnackbarContext";
 import { GoogleLogin } from "@react-oauth/google";
 import userService from "../services/userService";
+import { jwtDecode } from "jwt-decode";
 
 const loginValidationSchema = Yup.object().shape({
   username: Yup.string()
@@ -45,10 +46,13 @@ const Login = () => {
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
-  const sendTokenToApi = async (idToken) => {
+  const sendTokenToApi = async (extendedTokenData) => {
     try {
-      await login(idToken);
-      if (idToken) {
+      await login({
+        ...extendedTokenData,
+        token: jwtDecode(JSON.stringify(extendedTokenData.token)),
+      });
+      if (extendedTokenData.authenticated) {
         setSnackbar({
           open: true,
           message: "Login successfully",
@@ -73,7 +77,7 @@ const Login = () => {
         password: data.password,
       };
       const response = await userService.login(reqPayload);
-      login(response.data.token);
+      login(response.data);
       if (response.data && response.status === 200) {
         setSnackbar({
           open: true,
@@ -104,13 +108,13 @@ const Login = () => {
   };
   return (
     <Container
+      component="main"
       sx={{
-        my: "6rem",
-        py: { xs: 5, md: 10 },
         display: "flex",
         flexDirection: { xs: "column", lg: "row" },
+        py: { xs: 10 },
         alignItems: "center",
-        height: "100%",
+        minHeight: "100vh",
       }}
     >
       <Box
@@ -124,6 +128,7 @@ const Login = () => {
         <img
           src="https://www.creative-tim.com/twcomponents/svg/secure-login-animate.svg"
           alt="Cover Page"
+          loading="lazy"
           style={{
             width: "100%",
             height: "auto",
@@ -192,14 +197,18 @@ const Login = () => {
           <GoogleLogin
             onSuccess={(credentialResponse) => {
               // console.log(credentialResponse);
-              sendTokenToApi(credentialResponse?.credential);
+              const extendedTokenData = {
+                token: credentialResponse?.credential,
+                authenticated: true,
+              };
+              sendTokenToApi(extendedTokenData);
               navigate("/read");
             }}
-            onError={() => {
-              console.log("Login Failed");
+            onError={(error) => {
+              console.error(error);
             }}
-            shape="pill"
-            theme="filled_black"
+            shape="circle"
+            // theme="outline"
           />
           <Button
             variant="outlined"

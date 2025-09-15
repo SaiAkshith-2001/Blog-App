@@ -13,12 +13,11 @@ const Home = () => {
   return (
     <Container
       sx={{
-        my: "6rem",
-        py: { xs: 5, md: 10 },
         display: "flex",
         flexDirection: { xs: "column", lg: "row" },
         alignItems: "center",
-        height: "100%",
+        minHeight: "100vh",
+        py: { xs: 10 },
       }}
     >
       <Box
@@ -96,6 +95,7 @@ const Home = () => {
         <img
           src="https://www.creative-tim.com/twcomponents/svg/website-designer-bro-purple.svg"
           alt="Cover Page"
+          loading="lazy"
           style={{
             width: "100%",
             height: "auto",

@@ -39,12 +39,21 @@ const Profile = () => {
   }, [id]);
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", mt: 16 }}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        mt: 16,
+        minHeight: "100vh",
+      }}
+    >
       {userData && (
         <Card
           sx={{
+            height: "100%",
+            maxHeight: 500,
+            width: "90%",
             maxWidth: 500,
-            width: "100%",
             p: 3,
             borderRadius: 3,
             boxShadow: 3,
@@ -69,7 +78,7 @@ const Profile = () => {
               {userData?.username}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {userData?.role}
+              {userData?.role[0]?.role}
             </Typography>
           </Box>
           <Divider sx={{ my: 3 }} />

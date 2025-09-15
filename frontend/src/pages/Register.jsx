@@ -102,7 +102,17 @@ const Register = () => {
     }
   };
   return (
-    <Container component="main" maxWidth="xs" sx={{ my: "6rem" }}>
+    <Container
+      component="main"
+      maxWidth="sm"
+      sx={{
+        display: "flex",
+        flexDirection: { xs: "column", lg: "row" },
+        py: { xs: 10 },
+        alignItems: "center",
+        minHeight: "100vh",
+      }}
+    >
       <Box
         sx={{
           display: "flex",

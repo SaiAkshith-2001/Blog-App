@@ -2,7 +2,13 @@ import { Container, Typography, Paper } from "@mui/material";
 
 const NotFound = () => {
   return (
-    <Container maxWidth="md" sx={{ marginTop: "6rem" }}>
+    <Container
+      maxWidth="md"
+      sx={{
+        my: "6rem",
+        minHeight: "100vh",
+      }}
+    >
       <Paper elevation={3} sx={{ p: "2rem" }}>
         <Typography variant="h4" component="h1" gutterBottom>
           404 Uh-Oh..
