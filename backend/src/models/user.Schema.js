@@ -1,6 +1,14 @@
-import mongoose, { Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
-import { Role } from "./role.Schema.js";
+export const UsingAuth = {
+  google: "Google",
+  local: "Local",
+};
+
+const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+
 const userSchema = new Schema(
   {
     username: {
@@ -15,26 +23,27 @@ const userSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "Please fill a valid email address",
-      ],
+      match: [emailRegex, "Please fill a valid email address"],
     },
     password: {
       type: String,
       required: function () {
         return this.authType === "local";
       },
+      match: [
+        passwordRegex,
+        "Password should contain atleast one Uppercase, one lowercase, a special character and a numeric value",
+      ],
       minlength: 8,
     },
     googleId: { type: String, unique: true, sparse: true },
-    authType: { type: String, enum: ["local", "google"] },
+    authType: { type: String, enum: Object.values(UsingAuth) },
     profilePicture: { type: String },
     role: {
       type: [
         {
           type: Schema.Types.ObjectId,
-          ref: Role,
+          ref: "Role",
         },
       ],
     },

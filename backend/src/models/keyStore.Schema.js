@@ -1,8 +1,8 @@
-import mongoose, { Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 const keyStoreSchema = new Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
