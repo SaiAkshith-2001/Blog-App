@@ -20,10 +20,12 @@ import {
   Avatar,
 } from "@mui/material";
 import LoadingBar from "react-top-loading-bar";
-import { navItems } from "../utils/constants";
+import { navItems, menuItems } from "../utils/constants";
 import { AuthContext } from "../context/AuthContext";
-import logo from "../assests/images/logo512.png";
-import { Link } from "react-router-dom";
+import { SnackbarContext } from "../context/SnackbarContext";
+import { Link, useNavigate } from "react-router-dom";
+import logo from "../assests/images/logo512.webp";
+import userService from "../services/userService";
 const ThemeToggleButton = lazy(() => import("../components/ToggleButton"));
 const MenuIcon = lazy(() => import("@mui/icons-material/Menu"));
 const LogoutIcon = lazy(() => import("@mui/icons-material/Logout"));
@@ -35,6 +37,8 @@ const AppNavBar = ({ window, theme }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [progress, setProgress] = useState(0);
   const { user, logout } = useContext(AuthContext);
+  const { setSnackbar } = useContext(SnackbarContext);
+  const navigate = useNavigate();
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
@@ -54,7 +58,16 @@ const AppNavBar = ({ window, theme }) => {
   const handleLogout = async () => {
     try {
       setAnchorEl(null);
-      await logout();
+      const response = await userService.logout();
+      logout(response.data);
+      if (response.status === 200) {
+        setSnackbar({
+          open: true,
+          message: response.data.message,
+          severity: "success",
+        });
+      }
+      navigate("/");
     } catch (error) {
       console.error(error);
     }
@@ -135,6 +148,7 @@ const AppNavBar = ({ window, theme }) => {
               <Box
                 component="img"
                 src={logo}
+                alt="logo"
                 sx={{
                   alignItems: "center",
                   width: { xs: "20px", sm: "25px" },
@@ -165,7 +179,9 @@ const AppNavBar = ({ window, theme }) => {
           {user ? (
             <Tooltip title="Profile" arrow>
               <IconButton color="inherit" onClick={handleMenuOpen}>
-                <Avatar alt={user?.name} src={user?.picture ?? user?.name} />
+                <Avatar alt={user?.name} src={user?.picture}>
+                  {user?.picture ?? user?.username[0]?.toUpperCase()}
+                </Avatar>
               </IconButton>
             </Tooltip>
           ) : (
@@ -182,7 +198,7 @@ const AppNavBar = ({ window, theme }) => {
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
-            onClose={() => handleMenuClose()}
+            onClose={handleMenuClose}
             anchorOrigin={{
               vertical: "bottom",
               horizontal: "right",
@@ -193,29 +209,24 @@ const AppNavBar = ({ window, theme }) => {
             }}
           >
             {!user
-              ? [
+              ? menuItems.map((item, index) => (
                   <MenuItem
+                    key={index}
                     component={Link}
-                    to="/login"
-                    onClick={() => handleMenuClose()}
+                    to={item.path}
+                    onClick={handleMenuClose}
                   >
-                    Login
-                  </MenuItem>,
-                  <MenuItem
-                    component={Link}
-                    to="/register"
-                    onClick={() => handleMenuClose()}
-                  >
-                    Register
-                  </MenuItem>,
-                ]
+                    {item.text}
+                  </MenuItem>
+                ))
               : [
                   <MenuItem
                     component={Link}
+                    index={0}
                     to={`/profile/${
                       user?.username || user?.email.split("@")[0]
                     }`}
-                    onClick={() => handleMenuClose()}
+                    onClick={handleMenuClose}
                   >
                     <ListItemIcon>
                       <PersonRoundedIcon />
@@ -223,9 +234,10 @@ const AppNavBar = ({ window, theme }) => {
                     Profile
                   </MenuItem>,
                   <MenuItem
+                    index={1}
                     component={Link}
                     to="/"
-                    onClick={() => handleLogout()}
+                    onClick={handleLogout}
                   >
                     <ListItemIcon sx={{ color: "red" }}>
                       <LogoutIcon />
@@ -238,6 +250,7 @@ const AppNavBar = ({ window, theme }) => {
         </Toolbar>
       </AppBar>
       <Drawer
+        component="nav"
         aria-label="Navigation Menu"
         container={container}
         variant="temporary"

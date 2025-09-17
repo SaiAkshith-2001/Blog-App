@@ -24,3 +24,13 @@ export const navItems = [
     path: "/about",
   },
 ];
+export const menuItems = [
+  {
+    text: "Login",
+    path: "/login",
+  },
+  {
+    text: "Register",
+    path: "/register",
+  },
+];
