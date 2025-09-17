@@ -9,6 +9,8 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { frontendUrl } from "./config/constants.js";
 import redisCache from "./cache/redis.cache.js";
+import swaggerDocs from "./utils/swagger.js";
+import logger from "./core/logger.js";
 // import { Configuration, OpenAIApi } from "openai"
 
 const app = express();
@@ -31,7 +33,7 @@ const limiter = rateLimit({
 app.use(limiter);
 app.use("/api/user", userRoutes);
 app.use("/api/posts", postRoutes);
-
+app.use("/api-docs", swaggerDocs);
 redisCache.connectRedis();
 
 process.on("SIGINT", async () => {
