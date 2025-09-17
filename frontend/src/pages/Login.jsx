@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, Profiler } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import {
@@ -103,125 +103,118 @@ const Login = () => {
       }
     }
   };
+  const onRenderCallbackFn = (id, phase, acutalDuration) => {
+    console.log(
+      `id: ${id}, phase: ${phase}, acutalDuration: ${acutalDuration}`
+    );
+  };
   const redirectToRegister = () => {
     navigate("/register");
   };
   return (
-    <Container
-      component="main"
-      sx={{
-        display: "flex",
-        flexDirection: { xs: "column", lg: "row" },
-        py: { xs: 10 },
-        alignItems: "center",
-        minHeight: "100vh",
-      }}
-    >
-      <Box
-        sx={{
-          width: { xs: "100%", lg: "50%" },
-          mt: { xs: 4, lg: 0 },
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <img
-          src="https://www.creative-tim.com/twcomponents/svg/secure-login-animate.svg"
-          alt="Cover Page"
-          loading="lazy"
-          style={{
-            width: "100%",
-            height: "auto",
-            maxWidth: "400px",
-          }}
-        />
-      </Box>
-      <Box
+    <Profiler id="Login" onRender={onRenderCallbackFn}>
+      <Container
+        component="main"
         sx={{
           display: "flex",
-          flexDirection: "column",
+          flexDirection: { xs: "column" },
+          py: { xs: 10 },
           alignItems: "center",
+          minHeight: "100vh",
         }}
       >
-        <Typography variant="h4" component="h1">
-          Login
-        </Typography>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <TextField
-            placeholder="Username"
-            name="username"
-            required
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            {...register("username")}
-            error={Boolean(errors.username)}
-            helperText={errors.username?.message}
-            autoFocus
-          />
-          <TextField
-            placeholder="Password"
-            name="password"
-            required
-            type={showPassword ? "text" : "password"}
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            {...register("password")}
-            error={Boolean(errors.password)}
-            helperText={errors.password?.message}
-            InputProps={{
-              endAdornment: (
-                <Tooltip title={showPassword ? "Hide" : "Show"} arrow>
-                  <IconButton onClick={handleShowPassword}>
-                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                  </IconButton>
-                </Tooltip>
-              ),
-            }}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ textTransform: "none", my: "2rem" }}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              "Login"
-            )}
-          </Button>
-          <GoogleLogin
-            onSuccess={(credentialResponse) => {
-              // console.log(credentialResponse);
-              const extendedTokenData = {
-                token: credentialResponse?.credential,
-                authenticated: true,
-              };
-              sendTokenToApi(extendedTokenData);
-              navigate("/read");
-            }}
-            onError={(error) => {
-              console.error(error);
-            }}
-            shape="circle"
-            // theme="outline"
-          />
-          <Button
-            variant="outlined"
-            color="primary"
-            fullWidth
-            sx={{ mt: 3, textTransform: "none" }}
-            onClick={redirectToRegister}
-          >
-            Create an account/Sign up
-          </Button>
-        </form>
-      </Box>
-    </Container>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            mt: "4rem",
+          }}
+        >
+          <Typography variant="h4" component="h1">
+            Login
+          </Typography>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <TextField
+              placeholder="Username"
+              name="username"
+              required
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              {...register("username")}
+              error={Boolean(errors.username)}
+              helperText={errors.username?.message}
+              autoFocus
+            />
+            <TextField
+              placeholder="Password"
+              name="password"
+              required
+              type={showPassword ? "text" : "password"}
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              {...register("password")}
+              error={Boolean(errors.password)}
+              helperText={errors.password?.message}
+              InputProps={{
+                endAdornment: (
+                  <Tooltip title={showPassword ? "Hide" : "Show"} arrow>
+                    <IconButton onClick={handleShowPassword}>
+                      {showPassword ? (
+                        <VisibilityOffIcon />
+                      ) : (
+                        <VisibilityIcon />
+                      )}
+                    </IconButton>
+                  </Tooltip>
+                ),
+              }}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ textTransform: "none", my: "2rem" }}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                "Login"
+              )}
+            </Button>
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                // console.log(credentialResponse);
+                const extendedTokenData = {
+                  token: credentialResponse?.credential,
+                  authenticated: true,
+                };
+                sendTokenToApi(extendedTokenData);
+                navigate("/read");
+              }}
+              onError={(error) => {
+                console.error(error);
+              }}
+              shape="circle"
+              // theme="outline"
+            />
+            <Button
+              variant="outlined"
+              color="primary"
+              fullWidth
+              sx={{ mt: 3, textTransform: "none" }}
+              onClick={redirectToRegister}
+            >
+              Create an account/Sign up
+            </Button>
+          </form>
+        </Box>
+      </Container>
+    </Profiler>
   );
 };
 

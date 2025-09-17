@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { Profiler, useContext, useState } from "react";
 import {
   Container,
   TextField,
@@ -101,132 +101,143 @@ const Register = () => {
       }
     }
   };
+  const onRenderCallbackFn = (id, phase, acutalDuration) => {
+    console.log(
+      `id: ${id}, phase: ${phase}, acutalDuration: ${acutalDuration}`
+    );
+  };
   return (
-    <Container
-      component="main"
-      maxWidth="sm"
-      sx={{
-        display: "flex",
-        flexDirection: { xs: "column", lg: "row" },
-        py: { xs: 10 },
-        alignItems: "center",
-        minHeight: "100vh",
-      }}
-    >
-      <Box
+    <Profiler id="Register" onRender={onRenderCallbackFn}>
+      <Container
+        component="main"
+        maxWidth="sm"
         sx={{
           display: "flex",
-          flexDirection: "column",
+          flexDirection: { xs: "column", lg: "row" },
+          py: { xs: 10 },
           alignItems: "center",
-          mt: "4rem",
+          minHeight: "100vh",
         }}
       >
-        <Typography variant="h4" component="h1">
-          Register
-        </Typography>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <TextField
-            placeholder="Username"
-            name="username"
-            required
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            {...register("username")}
-            error={Boolean(errors.username)}
-            helperText={errors.username?.message}
-            autoFocus
-          />
-          <TextField
-            placeholder="Email"
-            name="email"
-            required
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            {...register("email")}
-            error={Boolean(errors.email)}
-            helperText={errors.email?.message}
-          />
-          <TextField
-            placeholder="Password"
-            name="password"
-            required
-            variant="outlined"
-            margin="normal"
-            fullWidth
-            type={showPassword ? "text" : "password"}
-            {...register("password")}
-            error={Boolean(errors.password)}
-            helperText={errors.password?.message}
-            InputProps={{
-              endAdornment: (
-                <Tooltip title={showPassword ? "Hide" : "Show"} arrow>
-                  <IconButton onClick={handleShowPassword}>
-                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                  </IconButton>
-                </Tooltip>
-              ),
-            }}
-          />
-          <TextField
-            placeholder="Confirm Password"
-            name="confirmPassword"
-            required
-            variant="outlined"
-            margin="normal"
-            fullWidth
-            type={showPassword ? "text" : "password"}
-            {...register("confirmPassword")}
-            error={Boolean(errors.confirmPassword)}
-            helperText={errors.confirmPassword?.message}
-          />
-          <Box sx={{ p: 2 }}>
-            <FormControl>
-              <RadioGroup
-                row
-                name="role"
-                value={selectedRole}
-                onChange={handleRoleChange}
-              >
-                {roles.map((role, index) => (
-                  <FormControlLabel
-                    key={index}
-                    value={role}
-                    control={<Radio />}
-                    label={<Typography>{role}</Typography>}
-                  />
-                ))}
-              </RadioGroup>
-            </FormControl>
-          </Box>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            sx={{ textTransform: "none", my: 2 }}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              "Register"
-            )}
-          </Button>
-          <Typography sx={{ alignItems: "center" }}>
-            Already have an account?{" "}
-            <Button
-              variant="text"
-              onClick={redirectToLogin}
-              sx={{ textTransform: "none" }}
-            >
-              Sign In
-            </Button>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            mt: "4rem",
+          }}
+        >
+          <Typography variant="h4" component="h1">
+            Register
           </Typography>
-        </form>
-      </Box>
-    </Container>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <TextField
+              placeholder="Username"
+              name="username"
+              required
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              {...register("username")}
+              error={Boolean(errors.username)}
+              helperText={errors.username?.message}
+              autoFocus
+            />
+            <TextField
+              placeholder="Email"
+              name="email"
+              required
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              {...register("email")}
+              error={Boolean(errors.email)}
+              helperText={errors.email?.message}
+            />
+            <TextField
+              placeholder="Password"
+              name="password"
+              required
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              type={showPassword ? "text" : "password"}
+              {...register("password")}
+              error={Boolean(errors.password)}
+              helperText={errors.password?.message}
+              InputProps={{
+                endAdornment: (
+                  <Tooltip title={showPassword ? "Hide" : "Show"} arrow>
+                    <IconButton onClick={handleShowPassword}>
+                      {showPassword ? (
+                        <VisibilityOffIcon />
+                      ) : (
+                        <VisibilityIcon />
+                      )}
+                    </IconButton>
+                  </Tooltip>
+                ),
+              }}
+            />
+            <TextField
+              placeholder="Confirm Password"
+              name="confirmPassword"
+              required
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              type={showPassword ? "text" : "password"}
+              {...register("confirmPassword")}
+              error={Boolean(errors.confirmPassword)}
+              helperText={errors.confirmPassword?.message}
+            />
+            <Box sx={{ p: 2 }}>
+              <FormControl>
+                <RadioGroup
+                  row
+                  name="role"
+                  value={selectedRole}
+                  onChange={handleRoleChange}
+                >
+                  {roles.map((role, index) => (
+                    <FormControlLabel
+                      key={index}
+                      value={role}
+                      control={<Radio />}
+                      label={<Typography>{role}</Typography>}
+                    />
+                  ))}
+                </RadioGroup>
+              </FormControl>
+            </Box>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={{ textTransform: "none", my: 2 }}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                "Register"
+              )}
+            </Button>
+            <Typography sx={{ alignItems: "center" }}>
+              Already have an account?{" "}
+              <Button
+                variant="text"
+                onClick={redirectToLogin}
+                sx={{ textTransform: "none" }}
+              >
+                Sign In
+              </Button>
+            </Typography>
+          </form>
+        </Box>
+      </Container>
+    </Profiler>
   );
 };
 export default Register;
