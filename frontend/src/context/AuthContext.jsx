@@ -1,40 +1,36 @@
-import { createContext, useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import { createContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
+
 const AuthProvider = ({ children }) => {
-  const [authTokens, setAuthTokens] = useState(() =>
-    localStorage.getItem("tokens")
-      ? JSON.parse(localStorage.getItem("tokens"))
-      : null
-  );
-  const [user, setUser] = useState(() =>
-    localStorage.getItem("tokens")
-      ? jwtDecode(localStorage.getItem("tokens"))
-      : null
-  );
-  const login = (tokens) => {
-    setAuthTokens(tokens);
-    setUser(jwtDecode(tokens));
-    localStorage.setItem("tokens", JSON.stringify(tokens));
+  const [user, setUser] = useState(null);
+  const [authState, setAuthState] = useState({
+    loading: true,
+    isUserAuthenticated: false,
+  });
+
+  const login = (res) => {
+    setAuthState({
+      loading: false,
+      isUserAuthenticated: true,
+    });
+    const data = res.token ?? res.user;
+    setUser(data);
   };
 
   const logout = () => {
-    setAuthTokens(null);
+    setAuthState({ loading: false, isUserAuthenticated: false });
     setUser(null);
-    localStorage.removeItem("tokens");
   };
 
   useEffect(() => {
-    if (authTokens) {
-      setUser(jwtDecode(authTokens));
+    if (authState) {
+      setUser(user);
     }
-  }, [authTokens]);
+  }, [user, authState]);
 
   return (
-    <AuthContext.Provider
-      value={{ authTokens, setAuthTokens, user, login, logout }}
-    >
+    <AuthContext.Provider value={{ login, logout, user, authState }}>
       {children}
     </AuthContext.Provider>
   );
