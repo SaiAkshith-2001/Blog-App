@@ -27,7 +27,7 @@ export const paginationMiddleware = (model) => {
       res.paginatedResults = paginatedResults;
       next();
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      return next(error);
     }
   };
 };

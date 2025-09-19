@@ -30,6 +30,6 @@ export default router.use(async (req, res, next) => {
     req.keystore = keystore;
     next();
   } catch (error) {
-    console.error("error", error.message);
+    return next(error);
   }
 });

@@ -31,10 +31,6 @@ export default router.use(async (req, res, next) => {
     if (!authorized) throw new Error("Permission Denied");
     next();
   } catch (error) {
-    console.error("error:", error);
-    res.status(500).json({
-      message: "Internal Server error",
-      error: error.message,
-    });
+    return next(error);
   }
 });
