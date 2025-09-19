@@ -8,8 +8,10 @@ import { createToken, validateTokenData } from "../config/token.utils.js";
 import JWT from "../config/generateToken.js";
 import { Types } from "mongoose";
 import { KeyStore } from "../models/keyStore.Schema.js";
-import { getRole } from "./roleController.js";
-import { Roles } from "../models/role.Schema.js";
+import { createRole, getRole } from "./roleController.js";
+import { ROLES } from "../models/role.Schema.js";
+import { PERMISSION } from "../models/apiKey.Schema.js";
+import { createApiKey } from "./apiKeyController.js";
 
 export const register = async (req, res) => {
   try {
@@ -32,10 +34,28 @@ export const register = async (req, res) => {
       username,
       password,
       email,
-      role: [await getRole(Roles.user, Roles.admin)],
+      role: [await getRole(ROLES.user, ROLES.admin)],
       isActive: true,
     });
     await newUser.save();
+    const roleCodeExtended = ROLES.user;
+    const isActive = true;
+    await createRole(newUser._id, roleCodeExtended, isActive);
+
+    const generateApiKey = crypto.randomBytes(32).toString("hex");
+    const saltRounds = 10;
+    const generateHashedApiKey = await bcrypt.hash(generateApiKey, saltRounds);
+    const permissionExtended = PERMISSION.general;
+    const status = true;
+    console.log(
+      `generateApiKey: ${generateApiKey}, ${permissionExtended}, ${status}`
+    );
+    await createApiKey(
+      newUser._id,
+      generateHashedApiKey,
+      permissionExtended,
+      status
+    );
     if (newUser) {
       const accessTokenKey = crypto.randomBytes(64).toString("hex");
       const refreshTokenKey = crypto.randomBytes(64).toString("hex");

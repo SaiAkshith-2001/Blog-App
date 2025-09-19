@@ -13,7 +13,7 @@ import {
   refreshAccessToken,
 } from "../controllers/userController.js";
 import roles from "../helper/roles.js";
-import { Roles } from "../models/role.Schema.js";
+import { ROLES } from "../models/role.Schema.js";
 
 const router = express.Router();
 /**
@@ -177,9 +177,9 @@ router.use(authentication);
 router.route("/profile/:id").get(getUserProfileById);
 router
   .route("/profile/:id")
-  .patch(roles(Roles.user), authorization, updateUserById);
+  .patch(roles(ROLES.user), authorization, updateUserById);
 router
   .route("/profile/:id")
-  .delete(roles(Roles.user), authorization, deleteUserById);
+  .delete(roles(ROLES.user), authorization, deleteUserById);
 
 export default router;

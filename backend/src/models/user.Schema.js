@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
-export const UsingAuth = {
+export const AUTHTYPE = {
   google: "Google",
   local: "Local",
 };
@@ -37,7 +37,7 @@ const userSchema = new Schema(
       minlength: 8,
     },
     googleId: { type: String, unique: true, sparse: true },
-    authType: { type: String, enum: Object.values(UsingAuth) },
+    authType: { type: String, enum: Object.values(AUTHTYPE) },
     profilePicture: { type: String },
     role: {
       type: [
@@ -58,8 +58,8 @@ const userSchema = new Schema(
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   try {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(this.password, salt);
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(this.password, saltRounds);
     this.password = hashedPassword;
     next();
   } catch (error) {
